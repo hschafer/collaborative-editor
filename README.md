@@ -1,5 +1,5 @@
-<INSERT PROJECT NAME HERE>
+INSERT PROJECT NAME HERE
 --------------------------
 Authors: Andrew Dawson, Hunter Schafer, Natalie Andreeva
 
-Do good code, make cool shit
+#**Do good code, make cool shit.**
