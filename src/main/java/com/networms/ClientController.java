@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletResponse;
-
 /**
  * Created by Hunter on 11/18/16.
  */
@@ -16,15 +14,16 @@ import javax.servlet.http.HttpServletResponse;
 public class ClientController {
 
     @RequestMapping(value = {"", "/"}, method = RequestMethod.GET)
-    public ModelAndView newDocument(HttpServletResponse httpServletResponse) {
+    public ModelAndView newDocument() {
         // TODO: Establish connection to server and get new docId
         String docId = "abcd1234";
         return new ModelAndView("redirect:/editor?id=" + docId);
     }
 
     @RequestMapping(value="editor", method = RequestMethod.GET)
-    public void edit(@RequestParam(value="id", required=false, defaultValue="") String docId,
+    public void edit(@RequestParam(value="id") String docId,
                      Model model) {
+        // TODO: Establish connection to server with given docId
         model.addAttribute("docId", docId);
     }
 }
