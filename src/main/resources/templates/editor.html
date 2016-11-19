@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>461 Collaborative Editor</title>
 </head>
 <body>
 <h1>CSE 461 Collaborative Editor</h1>
 <p>Hello world! :D</p>
+    <p th:text="'You are editing document with ID = ' + ${docId} + '!'"/>
 </body>
 </html>
