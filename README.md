@@ -4,4 +4,5 @@ Authors: Andrew Dawson, Hunter Schafer, Natalie Andreeva
 
 #**Do good code, make cool shit.**
 
-Please follow instructions above
+# How to run the client
+In the root of the directory, run `./mvnw spring-boot:run`
