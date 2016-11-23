@@ -22,3 +22,8 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+
+### Frontend Stuff ###
+*/node_modules/*
+*/lib/*
