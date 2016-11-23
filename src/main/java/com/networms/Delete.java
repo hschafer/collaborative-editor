@@ -55,7 +55,7 @@ public class Delete implements Change {
                 if (currInsert.getIndex() > this.index) {
                 	currInsert.decrementIndex(this.length);
                 } else {
-                	this.incrementIndex(((Insert) curr).getTextLength());
+                	this.incrementIndex(currInsert.getTextLength());
                 }
             } else {
                 // no overlap
