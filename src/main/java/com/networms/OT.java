@@ -121,7 +121,6 @@ public class OT {
 
     }
 
-
     private static void deleteDelete(Change c1, Change c2) {
         if (c1.position + c1.text.length() <= c2.position + c2.text.length()) {
             // cur starts before iC starts & ends at or before iC ends
@@ -162,7 +161,4 @@ public class OT {
     public static Change deleteAt2() {
         return new Change(false, "howdy", 2);
     }
-
-
-
 }
