@@ -1,7 +1,5 @@
 package com.networms;
 
-import java.util.List;
-
 public class Delete implements Change {
 	private int index;
 	private int length;
@@ -48,46 +46,43 @@ public class Delete implements Change {
 	}
 	
 	@Override
-	public void applyOT(List<Change> pendingChanges) {
-        for (Change curr : pendingChanges) {
-            if (curr instanceof Insert) {
-            	Insert currInsert = (Insert) curr;
-                if (currInsert.getIndex() > this.index) {
-                	currInsert.decrementIndex(this.length);
-                } else {
-                	this.incrementIndex(currInsert.getTextLength());
-                }
+	public void applyOT(Change change) {
+        if (change instanceof Insert) {
+        	Insert currInsert = (Insert) change;
+            if (currInsert.getIndex() > this.index) {
+            	currInsert.decrementIndex(this.length);
             } else {
-                // no overlap
-            	Delete currDelete = (Delete) curr;
-                if (currDelete.index >= this.getEndIndex()) {
-                	currDelete.decrementIndex(this.length);
-                } else if (this.index >= currDelete.getEndIndex()) {
-                    this.decrementIndex(currDelete.length);
-                } else {
-                    // overlap
-                    if (this.equals(currDelete)){
-                        // exact same deletion
-                    	this.makeEmptyDelete();
-                    	currDelete.makeEmptyDelete();
-                    } else if (currDelete.index == this.index) {
-                        if (currDelete.length < this.length) {
-                            // curr ends first
-                            this.incrementIndex(currDelete.length);
-                            this.decrementLength(currDelete.length);
-                            currDelete.makeEmptyDelete();
-                        } else {
-                            currDelete.incrementIndex(this.length);
-                            currDelete.decrementLength(this.length);
-                            this.makeEmptyDelete();
-                        }
-                    } else if (currDelete.index < this.index) {
-                        deleteDelete(currDelete, this);
+            	this.incrementIndex(currInsert.getText().length());
+            }
+        } else {
+            // no overlap
+        	Delete currDelete = (Delete) change;
+            if (currDelete.index >= this.getEndIndex()) {
+            	currDelete.decrementIndex(this.length);
+            } else if (this.index >= currDelete.getEndIndex()) {
+                this.decrementIndex(currDelete.length);
+            } else {
+                // overlap
+                if (this.equals(currDelete)){
+                    // exact same deletion
+                	this.makeEmptyDelete();
+                	currDelete.makeEmptyDelete();
+                } else if (currDelete.index == this.index) {
+                    if (currDelete.length < this.length) {
+                        // curr ends first
+                        this.incrementIndex(currDelete.length);
+                        this.decrementLength(currDelete.length);
+                        currDelete.makeEmptyDelete();
                     } else {
-                        deleteDelete(this, currDelete);
+                        currDelete.incrementIndex(this.length);
+                        currDelete.decrementLength(this.length);
+                        this.makeEmptyDelete();
                     }
+                } else if (currDelete.index < this.index) {
+                    deleteDelete(currDelete, this);
+                } else {
+                    deleteDelete(this, currDelete);
                 }
-
             }
         }
 	}

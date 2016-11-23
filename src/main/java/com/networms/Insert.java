@@ -1,7 +1,5 @@
 package com.networms;
 
-import java.util.List;
-
 public class Insert implements Change {
 	private int index;
 	private String text;
@@ -27,10 +25,6 @@ public class Insert implements Change {
 		this.text = text;
 	}
 	
-	public int getTextLength() {
-		return this.text.length();
-	}
-	
 	public void incrementIndex(int amount) {
 		this.index += amount;
 	}
@@ -40,28 +34,26 @@ public class Insert implements Change {
 	}
 
 	@Override
-	public void applyOT(List<Change> pendingChanges) {
-        for (Change curr : pendingChanges) {
-            if (curr instanceof Insert) {
-            	Insert currInsert = (Insert) curr;
-                if (currInsert.index >= this.index) {
-                    currInsert.incrementIndex(this.getTextLength());
-                } else {
-                    this.incrementIndex(currInsert.getTextLength());
-                }
+	public void applyOT(Change change) {
+        if (change instanceof Insert) {
+        	Insert currInsert = (Insert) change;
+            if (currInsert.index >= this.index) {
+                currInsert.incrementIndex(this.text.length());
             } else {
-            	Delete currDelete = (Delete) curr;
-                if (currDelete.getIndex() >= this.index) {
-                	currDelete.incrementIndex(this.getTextLength());
-                } else if (this.index >= currDelete.getEndIndex()){
-                    // not overlapping
-                    this.decrementIndex(currDelete.getLength());
-                } else {
-                    // if inserting in the middle of stuff about to be deleted
-                    // just make the insert to the beginning of deletion
-                    this.index = currDelete.getIndex();
-                }
+                this.incrementIndex(currInsert.text.length());
+            }
+        } else {
+        	Delete currDelete = (Delete) change;
+            if (currDelete.getIndex() >= this.index) {
+            	currDelete.incrementIndex(this.text.length());
+            } else if (this.index >= currDelete.getEndIndex()){
+                // not overlapping
+                this.decrementIndex(currDelete.getLength());
+            } else {
+                // if inserting in the middle of stuff about to be deleted
+                // just make the insert to the beginning of deletion
+                this.index = currDelete.getIndex();
             }
         }
-	}
+    }
 }
