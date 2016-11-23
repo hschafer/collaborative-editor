@@ -6,20 +6,18 @@ import java.util.*;
 public class OT {
 
     public static class Change {
-        String text;
-        int position;
-        boolean insert;
+        public boolean insert;
+        public String text;
+        public int position;
 
         public Change (Change copy) {
-            this.text = copy.text;
-            this.position = copy.position;
-            this.insert = copy.insert;
+            this(copy.insert, copy.text, copy.position);
         }
 
         public Change(boolean insert, String text, int position) {
+            this.insert = insert;
             this.text = text;
             this.position = position;
-            this.insert = insert;
         }
 
         public String toString() {
@@ -44,7 +42,7 @@ public class OT {
         System.out.println("____BEFORE____");
         System.out.println("pending changes " + pendingChanges);
         System.out.println("incoming change " + incomingChange);
-        OT(incomingChange, pendingChanges);
+        transform(incomingChange, pendingChanges);
         System.out.println("____AFTER____");
         System.out.println("pending changes " + pendingChanges);
         System.out.println("incoming change " + incomingChange);
@@ -52,7 +50,7 @@ public class OT {
     }
 
 
-    public static void OT(Change incomingChange, List<Change> pendingChanges) {
+    public static void transform(Change incomingChange, List<Change> pendingChanges) {
         if (incomingChange.insert) {
             for (Change curr : pendingChanges) {
                 if (curr.insert) {
