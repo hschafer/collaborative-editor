@@ -1,6 +1,10 @@
+body {
+  background-color: #f5f5f5;
+}
+
 #header {
-  padding-left: 1em;
-  padding-right: 1em;
+  padding-left: 0.7em;
+  padding-right: 0.7em;
 }
 
 .dropdown-button.btn-flat {
@@ -10,7 +14,8 @@
 }
 
 #textbox {
-  height: 80%;
+  background-color: #ffffff;
+  height: 450px;
   resize: none;
   border: none;
 }
