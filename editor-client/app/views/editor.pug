@@ -9,13 +9,26 @@ html(lang="en")
     script(src="https://code.jquery.com/jquery-3.1.1.min.js",   
            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=",
            crossorigin="anonymous")
+    link(rel="stylesheet",
+         href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css")
+
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js")
     script(src="/static/js/editor.js", 
            type="text/javascript")
 
   body
-    h1 CSE 461 - Collaborative Editor
-    p.
-      Hello world!:D  
-    textarea#textbox
-    button#test
-    button#dTest
+    include header.pug
+    
+    div.container
+      div.section
+        a.dropdown-button.btn-flat.waves-effect.waves-teal.right.right-align(href='#', data-activates='editors-list') There are 2 people editing this document right now
+
+        ul#editors-list.dropdown-content.right
+          li: span Hunter
+          li: span Anonymous
+
+      div.section
+        textarea#textbox.z-depth-2
+      div.section
+        button#test
+        button#dTest
