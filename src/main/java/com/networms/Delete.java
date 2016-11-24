@@ -1,8 +1,8 @@
 package com.networms;
 
 public class Delete implements Change {
-	private int index;
-	private int length;
+	public int index;
+	public int length;
 
 	public Delete(int index, int length) {
 		this.index = index;

@@ -1,8 +1,8 @@
 package com.networms;
 
 public class Insert implements Change {
-	private int index;
-	private String text;
+	public int index;
+	public String text;
 	
 	public Insert(int index, String text) {
 		this.index = index;
