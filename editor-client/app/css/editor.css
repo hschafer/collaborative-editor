@@ -1,7 +1,22 @@
-textarea {
-    width: 80%;
-    height: 50%;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
+#header {
+  padding-left: 1em;
+  padding-right: 1em;
 }
+
+.dropdown-button.btn-flat {
+  text-transform: none;
+  padding: 0px;
+  margin-bottom: 0.7em;
+}
+
+#textbox {
+  height: 80%;
+  resize: none;
+  border: none;
+}
+
+#textbox:focus {
+  outline-width: 0;
+}
+
+
