@@ -5,6 +5,7 @@ import pug from 'pug';
 
 const app = express();
 app.set('view engine', 'pug')
+app.set('views', './app/views')
 app.use('/static', express.static('public'))
 
 app.get('/', function(req, res, next) {
