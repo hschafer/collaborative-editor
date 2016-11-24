@@ -27,3 +27,4 @@ nbdist/
 ### Frontend Stuff ###
 */node_modules/*
 */lib/*
+*/public/*
