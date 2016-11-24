@@ -3,13 +3,14 @@ html(lang="en")
   head
     title="Networms Editor"
     meta(name="docId" content=docId)
-    style
-        include static/css/editor.css
+    link(rel="stylesheet",
+         type="text/css",
+         href="/static/css/editor.css")
     script(src="https://code.jquery.com/jquery-3.1.1.min.js",   
            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=",
            crossorigin="anonymous")
-    script 
-        include static/js/editor.js
+    script(src="/static/js/editor.js", 
+           type="text/javascript")
 
   body
     h1 CSE 461 - Collaborative Editor

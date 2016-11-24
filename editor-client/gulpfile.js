@@ -11,6 +11,17 @@ gulp.task('serve:build', function(done) {
     .pipe(gulp.dest('./lib'));
 });
 
+gulp.task('serve:babel', function(done) {
+  return gulp.src('./app/**/*.js')
+    .pipe(babel())
+    .pipe(gulp.dest('./public/'));
+});
+
+gulp.task('serve:style', function(done) {
+  return gulp.src('./app/**/*.css')
+    .pipe(gulp.dest('./public/'));
+});
+
 gulp.task('serve:run', function(done) {
   nodemon({
     exec: 'node ./lib/server.js',
@@ -19,4 +30,4 @@ gulp.task('serve:run', function(done) {
   });
 });
 
-gulp.task('serve', ['serve:build', 'serve:run']);
+gulp.task('serve', ['serve:build', 'serve:babel', 'serve:style', 'serve:run']);
