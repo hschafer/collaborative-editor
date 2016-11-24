@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var nodemon = require('gulp-nodemon');
 var babel = require('gulp-babel');
 
-gulp.task('serve:build', function(done) {
+gulp.task('serve:build-server', function(done) {
   return gulp.src('./server.js')
     .pipe(babel())
     .on('error', function handleError() {
@@ -30,4 +30,4 @@ gulp.task('serve:run', function(done) {
   });
 });
 
-gulp.task('serve', ['serve:build', 'serve:babel', 'serve:style', 'serve:run']);
+gulp.task('serve', ['serve:build-server', 'serve:babel', 'serve:style', 'serve:run']);
