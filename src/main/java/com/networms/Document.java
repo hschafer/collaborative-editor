@@ -46,17 +46,15 @@ public class Document {
     private void applyChangeToContents(Change nextChange) {
         int startPos = nextChange.index;
         if (nextChange instanceof Insert) {
-            String text = ((Insert)nextChange).text;
+            String text = ((Insert)nextChange).getText();
             for (int i = 0; i < text.length(); i++) {
                 this.contents.add(startPos + i, text.charAt(i));
             }
         } else {
-            int length = ((Delete)nextChange).length;
+            int length = ((Delete)nextChange).getLength();
             for (int i = 0; i < length; i++) {
                 this.contents.remove(startPos + i);
             }
         }
     }
-
-
 }
