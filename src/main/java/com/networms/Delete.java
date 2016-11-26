@@ -3,7 +3,6 @@ package com.networms;
 import java.util.Optional;
 
 public class Delete extends Change {
-	private int index;
 	private int length;
 	private Optional<Delete> second;
 

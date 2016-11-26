@@ -1,7 +1,6 @@
 package com.networms;
 
 public class Insert extends Change {
-	private int index;
 	private String text;
 	
 	public Insert(int index, String text) {
