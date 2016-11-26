@@ -1,6 +1,6 @@
 package com.networms.test;
-import com.networms.*;
 
+import com.networms.*;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -70,15 +70,15 @@ public class OTTest {
         assertEquals(6, second.getIndex());
         assertEquals(1, second.getLength());
     }
-    
+
     @Test
     public void testLongDeleteWithInsertAtStart() {
-    	Delete incoming = new Delete(0, 4);
+        Delete incoming = new Delete(0, 4);
         Insert pending = new Insert(3, "book");
-    	incoming.applyOT(pending);
-    	
-    	assertEquals(0, pending.getIndex());
-    	assertEquals("book", pending.getText());
+        incoming.applyOT(pending);
+
+        assertEquals(0, pending.getIndex());
+        assertEquals("book", pending.getText());
     }
 
     @Test
