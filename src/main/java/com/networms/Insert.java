@@ -1,21 +1,19 @@
 package com.networms;
 
-public class Insert implements Change {
-	public int index;
+public class Insert extends Change {
+
 	public String text;
 	
 	public Insert(int index, String text) {
-		this.index = index;
-		this.text = text;
+		this(index, text, 1);
 	}
 
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
-	}
+    public Insert (int index, String text, int version) {
+        this.index = index;
+        this.text = text;
+        this.time = System.currentTimeMillis();
+        this.version = version;
+    }
 
 	public String getText() {
 		return text;
@@ -24,16 +22,12 @@ public class Insert implements Change {
 	public void setText(String text) {
 		this.text = text;
 	}
-	
-	public void incrementIndex(int amount) {
-		this.index += amount;
-	}
-	
-	public void decrementIndex(int amount) {
-		this.index -= amount;
-	}
 
-	@Override
+    public String toString() {
+        return "insert " + this.text + " @" + this.index;
+    }
+
+    @Override
 	public void applyOT(Change change) {
         if (change instanceof Insert) {
         	Insert currInsert = (Insert) change;

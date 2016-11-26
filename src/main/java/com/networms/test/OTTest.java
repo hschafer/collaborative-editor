@@ -198,6 +198,4 @@ public class OTTest {
         assertEquals(0, ((Delete)pending).length);
         assertEquals(-1, ((Delete)pending).index);
     }
-
-
 }

@@ -1,20 +1,17 @@
 package com.networms;
 
-public class Delete implements Change {
-	public int index;
+public class Delete extends Change {
 	public int length;
 
 	public Delete(int index, int length) {
+		this(index, length, 1);
+	}
+
+	public Delete(int index, int length, int version) {
 		this.index = index;
 		this.length = length;
-	}
-
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
+		this.time = System.currentTimeMillis();
+		this.version = version;
 	}
 
 	public int getLength() {
@@ -23,14 +20,6 @@ public class Delete implements Change {
 
 	public void setLength(int length) {
 		this.length = length;
-	}
-	
-	public void incrementIndex(int amount) {
-		this.index += amount;
-	}
-	
-	public void decrementIndex(int amount) {
-		this.index -= amount;
 	}
 	
 	public void incrementLength(int amount) {
@@ -44,11 +33,10 @@ public class Delete implements Change {
 		return "delete " + this.length + " @" + this.index;
 	}
 
-	
 	public int getEndIndex() {
 		return index + length;
 	}
-	
+
 	@Override
 	public void applyOT(Change change) {
         if (change instanceof Insert) {
