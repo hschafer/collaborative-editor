@@ -211,6 +211,4 @@ public class OTTest {
         assertEquals(0, ((Delete)pending).getLength());
         assertEquals(-1, ((Delete)pending).getIndex());
     }
-
-
 }

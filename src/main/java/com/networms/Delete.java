@@ -2,22 +2,20 @@ package com.networms;
 
 import java.util.Optional;
 
-public class Delete implements Change {
+public class Delete extends Change {
 	private int index;
 	private int length;
 	private Optional<Delete> second;
 
 	public Delete(int index, int length) {
+		this(index, length, 1);
+	}
+
+	public Delete(int index, int length, int version) {
 		this.index = index;
 		this.length = length;
-	}
-
-	public int getIndex() {
-		return index;
-	}
-
-	public void setIndex(int index) {
-		this.index = index;
+		this.time = System.currentTimeMillis();
+		this.version = version;
 	}
 
 	public int getLength() {
@@ -47,7 +45,7 @@ public class Delete implements Change {
 	public void decrementIndex(int amount) {
 		this.index = Math.max(0, this.index - amount);
 	}
-	
+
 	public void incrementLength(int amount) {
 		this.length += amount;
 	}
@@ -59,11 +57,10 @@ public class Delete implements Change {
 		return "delete " + this.length + " @" + this.index;
 	}
 
-	
 	public int getEndIndex() {
 		return index + length;
 	}
-	
+
 	@Override
 	public void applyOT(Change change) {
         if (change instanceof Insert) {
