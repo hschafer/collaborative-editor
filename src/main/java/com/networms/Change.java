@@ -1,9 +1,10 @@
 package com.networms;
 
 public abstract class Change implements Comparable<Change> {
-    public long time;
-    public int index;
-    public int version;
+    long time;
+    int index;
+    int version;
+    Client sender;
 
     public int getIndex() {
         return index;
@@ -24,6 +25,10 @@ public abstract class Change implements Comparable<Change> {
 
     public void decrementIndex(int amount) {
         this.index -= amount;
+    }
+
+    public Client getSender() {
+        return this.sender;
     }
 
     public abstract void applyOT(Change change);

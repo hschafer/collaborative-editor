@@ -3,15 +3,18 @@ package com.networms;
 public class Insert extends Change {
     private String text;
 
+
+    // should be used for testing purposes only ?
     public Insert(int index, String text) {
-        this(index, text, 1);
+        this(index, text, 1, null);
     }
 
-    public Insert(int index, String text, int version) {
+    public Insert(int index, String text, int version, Client sender) {
         this.index = index;
         this.text = text;
         this.time = System.currentTimeMillis();
         this.version = version;
+        this.sender = sender;
     }
 
     public String getText() {

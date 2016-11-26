@@ -6,15 +6,17 @@ public class Delete extends Change {
     private int length;
     private Optional<Delete> second;
 
+    // should be used for testing purposes only ?
     public Delete(int index, int length) {
-        this(index, length, 1);
+        this(index, length, 1, null);
     }
 
-    public Delete(int index, int length, int version) {
+    public Delete(int index, int length, int version, Client sender) {
         this.index = index;
         this.length = length;
         this.time = System.currentTimeMillis();
         this.version = version;
+        this.sender = sender;
     }
 
     public int getLength() {
