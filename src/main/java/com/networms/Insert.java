@@ -1,8 +1,8 @@
 package com.networms;
 
 public class Insert implements Change {
-	public int index;
-	public String text;
+	private int index;
+	private String text;
 	
 	public Insert(int index, String text) {
 		this.index = index;
@@ -25,12 +25,16 @@ public class Insert implements Change {
 		this.text = text;
 	}
 	
+	public int getEndIndex() {
+		return this.index + this.text.length();
+	}
+	
 	public void incrementIndex(int amount) {
 		this.index += amount;
 	}
 	
 	public void decrementIndex(int amount) {
-		this.index -= amount;
+		this.index = Math.max(0, this.index - amount);
 	}
 
 	@Override

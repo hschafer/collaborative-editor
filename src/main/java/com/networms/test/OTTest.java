@@ -11,10 +11,10 @@ public class OTTest {
         Change incoming = new Insert(0, "hello");
         Change pending = new Insert(1, "world");
         incoming.applyOT(pending);
-        assertEquals("hello", ((Insert)incoming).text);
-        assertEquals(0, ((Insert)incoming).index);
-        assertEquals("world", ((Insert)pending).text);
-        assertEquals(6, ((Insert)pending).index);
+        assertEquals("hello", ((Insert)incoming).getText());
+        assertEquals(0, ((Insert)incoming).getIndex());
+        assertEquals("world", ((Insert)pending).getText());
+        assertEquals(6, ((Insert)pending).getIndex());
     }
 
     @Test
@@ -22,10 +22,10 @@ public class OTTest {
         Change incoming = new Insert(3, "h");
         Change pending = new Insert(0, "abc");
         incoming.applyOT(pending);
-        assertEquals("h", ((Insert)incoming).text);
-        assertEquals(6, ((Insert)incoming).index);
-        assertEquals("abc", ((Insert)pending).text);
-        assertEquals(0, ((Insert)pending).index);
+        assertEquals("h", ((Insert)incoming).getText());
+        assertEquals(6, ((Insert)incoming).getIndex());
+        assertEquals("abc", ((Insert)pending).getText());
+        assertEquals(0, ((Insert)pending).getIndex());
     }
 
     @Test
@@ -33,10 +33,10 @@ public class OTTest {
         Change incoming = new Insert(0, "hell");
         Change pending = new Insert(0, "lleh");
         incoming.applyOT(pending);
-        assertEquals("hell", ((Insert)incoming).text);
-        assertEquals(0, ((Insert)incoming).index);
-        assertEquals("lleh", ((Insert)pending).text);
-        assertEquals(4, ((Insert)pending).index);
+        assertEquals("hell", ((Insert)incoming).getText());
+        assertEquals(0, ((Insert)incoming).getIndex());
+        assertEquals("lleh", ((Insert)pending).getText());
+        assertEquals(4, ((Insert)pending).getIndex());
     }
 
     @Test
@@ -44,10 +44,10 @@ public class OTTest {
         Change incoming = new Delete(1, 2);
         Change pending = new Insert(3, "hello");
         incoming.applyOT(pending);
-        assertEquals(1, ((Delete)incoming).index);
-        assertEquals(2, ((Delete)incoming).length);
-        assertEquals(1, ((Insert)pending).index);
-        assertEquals("hello", ((Insert)pending).text);
+        assertEquals(1, ((Delete)incoming).getIndex());
+        assertEquals(2, ((Delete)incoming).getLength());
+        assertEquals(1, ((Insert)pending).getIndex());
+        assertEquals("hello", ((Insert)pending).getText());
     }
 
     @Test
@@ -56,23 +56,36 @@ public class OTTest {
         Change pending = new Insert(3, "hello");
         incoming.applyOT(pending);
 
-        assertEquals(1, ((Insert)pending).index);
-        assertEquals("hello", ((Insert)pending).index);
-        // !!!: putting this here because this test DOES NOT
-        // pass yet - code isn't there to deal with overlaps
-        // see slack-general channel pics for example :!!!
-        assertEquals(1, 0);
+        assertEquals(1, ((Insert)pending).getIndex());
+        assertEquals("hello", ((Insert)pending).getText());
+        assertEquals(1, ((Delete)incoming).getIndex());
+        assertEquals(2, ((Delete)incoming).getLength());
+        assertTrue(((Delete) incoming).hasSecond());
+        Delete second = ((Delete)incoming).getSecond().get();
+        assertEquals(6, second.getIndex());
+        assertEquals(1, second.getLength());
+    }
+    
+    @Test
+    public void testLongDeleteWithInsertAtStart() {
+    	Change incoming = new Delete(0, 4);
+    	Change pending = new Insert(3, "book");
+    	
+    	incoming.applyOT(pending);
+    	
+    	assertEquals(0, ((Insert)pending).getIndex());
+    	assertEquals("book", ((Insert)pending).getText());
     }
 
     @Test
-    public void testDeleteAtSamePlaceAsInsertSameLength() {
+    public void testDeleteAtSamePlaceAsInsertSamegetLength() {
         Change incoming = new Delete(0, 1);
         Change pending = new Insert(0, "a");
         incoming.applyOT(pending);
-        assertEquals(1, ((Delete)incoming).length);
-        assertEquals(1, ((Delete)incoming).index);
-        assertEquals("a", ((Insert)pending).text);
-        assertEquals(0, ((Insert)pending).index);
+        assertEquals(1, ((Delete)incoming).getLength());
+        assertEquals(1, ((Delete)incoming).getIndex());
+        assertEquals("a", ((Insert)pending).getText());
+        assertEquals(0, ((Insert)pending).getIndex());
     }
 
     @Test
@@ -80,10 +93,10 @@ public class OTTest {
         Change incoming = new Delete(0, 2);
         Change pending = new Insert(0, "a");
         incoming.applyOT(pending);
-        assertEquals(2, ((Delete)incoming).length);
-        assertEquals(1, ((Delete)incoming).index);
-        assertEquals("a", ((Insert)pending).text);
-        assertEquals(0, ((Insert)pending).index);
+        assertEquals(2, ((Delete)incoming).getLength());
+        assertEquals(1, ((Delete)incoming).getIndex());
+        assertEquals("a", ((Insert)pending).getText());
+        assertEquals(0, ((Insert)pending).getIndex());
 
     }
 
@@ -92,10 +105,10 @@ public class OTTest {
         Change incoming = new Delete(0, 1);
         Change pending = new Insert(0, "ab");
         incoming.applyOT(pending);
-        assertEquals(1, ((Delete)incoming).length);
-        assertEquals(2, ((Delete)incoming).index);
-        assertEquals("ab", ((Insert)pending).text);
-        assertEquals(0, ((Insert)pending).index);
+        assertEquals(1, ((Delete)incoming).getLength());
+        assertEquals(2, ((Delete)incoming).getIndex());
+        assertEquals("ab", ((Insert)pending).getText());
+        assertEquals(0, ((Insert)pending).getIndex());
     }
 
     @Test
@@ -103,10 +116,10 @@ public class OTTest {
         Change incoming = new Delete(3, 1);
         Change pending = new Insert(0, "a");
         incoming.applyOT(pending);
-        assertEquals(1, ((Delete)incoming).length);
-        assertEquals(4, ((Delete)incoming).index);
-        assertEquals("a", ((Insert)pending).text);
-        assertEquals(0, ((Insert)pending).index);
+        assertEquals(1, ((Delete)incoming).getLength());
+        assertEquals(4, ((Delete)incoming).getIndex());
+        assertEquals("a", ((Insert)pending).getText());
+        assertEquals(0, ((Insert)pending).getIndex());
     }
 
     @Test
@@ -114,10 +127,10 @@ public class OTTest {
         Change incoming = new Delete(2, 2);
         Change pending = new Insert(1, "hello");
         incoming.applyOT(pending);
-        assertEquals(2, ((Delete)incoming).length);
-        assertEquals(7, ((Delete)incoming).index);
-        assertEquals("hello", ((Insert)pending).text);
-        assertEquals(1, ((Insert)pending).index);
+        assertEquals(2, ((Delete)incoming).getLength());
+        assertEquals(7, ((Delete)incoming).getIndex());
+        assertEquals("hello", ((Insert)pending).getText());
+        assertEquals(1, ((Insert)pending).getIndex());
     }
 
     @Test
@@ -125,10 +138,10 @@ public class OTTest {
         Change incoming = new Delete(0, 2);
         Change pending = new Delete(4, 2);
         incoming.applyOT(pending);
-        assertEquals(2, ((Delete)incoming).length);
-        assertEquals(0, ((Delete)incoming).index);
-        assertEquals(2, ((Delete)pending).length);
-        assertEquals(2, ((Delete)pending).index);
+        assertEquals(2, ((Delete)incoming).getLength());
+        assertEquals(0, ((Delete)incoming).getIndex());
+        assertEquals(2, ((Delete)pending).getLength());
+        assertEquals(2, ((Delete)pending).getIndex());
     }
 
     @Test
@@ -136,10 +149,10 @@ public class OTTest {
         Change incoming = new Delete(0, 2);
         Change pending = new Delete(1, 2);
         incoming.applyOT(pending);
-        assertEquals(1, ((Delete)incoming).length);
-        assertEquals(0, ((Delete)incoming).index);
-        assertEquals(1, ((Delete)pending).length);
-        assertEquals(0, ((Delete)pending).index);
+        assertEquals(1, ((Delete)incoming).getLength());
+        assertEquals(0, ((Delete)incoming).getIndex());
+        assertEquals(1, ((Delete)pending).getLength());
+        assertEquals(0, ((Delete)pending).getIndex());
     }
 
     @Test
@@ -147,10 +160,10 @@ public class OTTest {
         Change incoming = new Delete(4, 2);
         Change pending = new Delete(0, 2);
         incoming.applyOT(pending);
-        assertEquals(2, ((Delete)incoming).length);
-        assertEquals(2, ((Delete)incoming).index);
-        assertEquals(2, ((Delete)pending).length);
-        assertEquals(0, ((Delete)pending).index);
+        assertEquals(2, ((Delete)incoming).getLength());
+        assertEquals(2, ((Delete)incoming).getIndex());
+        assertEquals(2, ((Delete)pending).getLength());
+        assertEquals(0, ((Delete)pending).getIndex());
     }
 
     @Test
@@ -158,10 +171,10 @@ public class OTTest {
         Change incoming = new Delete(2, 2);
         Change pending = new Delete(0, 3);
         incoming.applyOT(pending);
-        assertEquals(1, ((Delete)incoming).length);
-        assertEquals(0, ((Delete)incoming).index);
-        assertEquals(2, ((Delete)pending).length);
-        assertEquals(0, ((Delete)pending).index);
+        assertEquals(1, ((Delete)incoming).getLength());
+        assertEquals(0, ((Delete)incoming).getIndex());
+        assertEquals(2, ((Delete)pending).getLength());
+        assertEquals(0, ((Delete)pending).getIndex());
 
     }
 
@@ -170,10 +183,10 @@ public class OTTest {
         Change incoming = new Delete(1, 2);
         Change pending = new Delete(1, 1);
         incoming.applyOT(pending);
-        assertEquals(1, ((Delete)incoming).length);
-        assertEquals(1, ((Delete)incoming).index);
-        assertEquals(0, ((Delete)pending).length);
-        assertEquals(-1, ((Delete)pending).index);
+        assertEquals(1, ((Delete)incoming).getLength());
+        assertEquals(1, ((Delete)incoming).getIndex());
+        assertEquals(0, ((Delete)pending).getLength());
+        assertEquals(-1, ((Delete)pending).getIndex());
     }
 
     @Test
@@ -181,10 +194,10 @@ public class OTTest {
         Change incoming = new Delete(1, 1);
         Change pending = new Delete(1, 2);
         incoming.applyOT(pending);
-        assertEquals(0, ((Delete)incoming).length);
-        assertEquals(-1, ((Delete)incoming).index);
-        assertEquals(1, ((Delete)pending).length);
-        assertEquals(1, ((Delete)pending).index);
+        assertEquals(0, ((Delete)incoming).getLength());
+        assertEquals(-1, ((Delete)incoming).getIndex());
+        assertEquals(1, ((Delete)pending).getLength());
+        assertEquals(1, ((Delete)pending).getIndex());
 
     }
 
@@ -193,10 +206,10 @@ public class OTTest {
         Change incoming = new Delete(1, 1);
         Change pending = new Delete(1, 1);
         incoming.applyOT(pending);
-        assertEquals(0, ((Delete)incoming).length);
-        assertEquals(-1, ((Delete)incoming).index);
-        assertEquals(0, ((Delete)pending).length);
-        assertEquals(-1, ((Delete)pending).index);
+        assertEquals(0, ((Delete)incoming).getLength());
+        assertEquals(-1, ((Delete)incoming).getIndex());
+        assertEquals(0, ((Delete)pending).getLength());
+        assertEquals(-1, ((Delete)pending).getIndex());
     }
 
 

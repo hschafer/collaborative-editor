@@ -1,8 +1,11 @@
 package com.networms;
 
+import java.util.Optional;
+
 public class Delete implements Change {
-	public int index;
-	public int length;
+	private int index;
+	private int length;
+	private Optional<Delete> second;
 
 	public Delete(int index, int length) {
 		this.index = index;
@@ -25,12 +28,24 @@ public class Delete implements Change {
 		this.length = length;
 	}
 	
+	public Optional<Delete> getSecond() {
+		return second;
+	}
+
+	public void setSecond(Optional<Delete> second) {
+		this.second = second;
+	}
+	
+	public boolean hasSecond() {
+		return second != null && second.isPresent();
+	}
+
 	public void incrementIndex(int amount) {
 		this.index += amount;
 	}
 	
 	public void decrementIndex(int amount) {
-		this.index -= amount;
+		this.index = Math.max(0, this.index - amount);
 	}
 	
 	public void incrementLength(int amount) {
@@ -54,7 +69,17 @@ public class Delete implements Change {
         if (change instanceof Insert) {
         	Insert currInsert = (Insert) change;
             if (currInsert.getIndex() > this.index) {
-            	currInsert.decrementIndex(this.length);
+            	if (this.getEndIndex() > currInsert.getIndex()) {
+            		// overlap
+            		int nonOverlapSize = currInsert.getIndex() - this.index;
+            		currInsert.decrementIndex(nonOverlapSize);
+            		int secondLength = this.length - nonOverlapSize;
+            		this.length = nonOverlapSize;
+            		this.second = Optional.of(new Delete(currInsert.getEndIndex(), secondLength));
+            	} else {
+            		// no overlap
+                	currInsert.decrementIndex(this.length);
+            	}
             } else {
             	this.incrementIndex(currInsert.getText().length());
             }
