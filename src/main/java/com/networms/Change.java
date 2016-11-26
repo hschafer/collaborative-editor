@@ -15,7 +15,7 @@ public abstract class Change implements Comparable<Change> {
 	
 	@Override
 	public int compareTo(Change other) {
-        return Math.toIntExact(((Change)other).time - this.time);
+        return Math.toIntExact(other.time - this.time);
 	}
 	
 	public void incrementIndex(int amount) {
@@ -26,5 +26,5 @@ public abstract class Change implements Comparable<Change> {
 		this.index -= amount;
 	}
 
-    public void applyOT(Change change) {}
+    public abstract void applyOT(Change change);
 }
