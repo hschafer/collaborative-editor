@@ -40,6 +40,10 @@ public class Delete implements Change {
 	public void decrementLength(int amount) {
 		this.length -= amount;
 	}
+	public String toString() {
+		return "delete " + this.length + " @" + this.index;
+	}
+
 	
 	public int getEndIndex() {
 		return index + length;
@@ -70,11 +74,11 @@ public class Delete implements Change {
                 } else if (currDelete.index == this.index) {
                     if (currDelete.length < this.length) {
                         // curr ends first
-                        this.incrementIndex(currDelete.length);
+                        this.index = currDelete.index;
                         this.decrementLength(currDelete.length);
                         currDelete.makeEmptyDelete();
                     } else {
-                        currDelete.incrementIndex(this.length);
+                        currDelete.index = this.index;
                         currDelete.decrementLength(this.length);
                         this.makeEmptyDelete();
                     }
@@ -100,10 +104,15 @@ public class Delete implements Change {
     private static void deleteDelete(Delete c1, Delete c2) {
         if (c1.getEndIndex() <= c2.getEndIndex()) {
             // cur starts before iC starts & ends at or before iC end
-            c1.length = c2.index - c1.index;
-            int oldC2Index = c2.index;
-            c2.index = c1.getEndIndex();
-            c2.decrementLength(c2.index - oldC2Index);
+
+			int oldC2Index = c2.index;
+			int oldC2Endex = c2.getEndIndex();
+			int oldC1Index = c1.index;
+			int oldC2Length = c2.length;
+			c2.index = c1.getEndIndex() - c1.length;
+			c2.length = (oldC2Endex - c1.index) - c1.length;
+			c1.index = oldC2Index - (oldC2Index - c1.index);
+			c1.length = (oldC2Endex - oldC1Index) - oldC2Length;
 
         } else {
             // curr starts before iC, ends after iC

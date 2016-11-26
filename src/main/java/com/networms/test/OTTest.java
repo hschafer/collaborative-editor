@@ -119,4 +119,85 @@ public class OTTest {
         assertEquals("hello", ((Insert)pending).text);
         assertEquals(1, ((Insert)pending).index);
     }
+
+    @Test
+    public void testDeleteBeforeDeleteNoOverlap() {
+        Change incoming = new Delete(0, 2);
+        Change pending = new Delete(4, 2);
+        incoming.applyOT(pending);
+        assertEquals(2, ((Delete)incoming).length);
+        assertEquals(0, ((Delete)incoming).index);
+        assertEquals(2, ((Delete)pending).length);
+        assertEquals(2, ((Delete)pending).index);
+    }
+
+    @Test
+    public void testDeleteBeforeDeleteWithOverlap() {
+        Change incoming = new Delete(0, 2);
+        Change pending = new Delete(1, 2);
+        incoming.applyOT(pending);
+        assertEquals(1, ((Delete)incoming).length);
+        assertEquals(0, ((Delete)incoming).index);
+        assertEquals(1, ((Delete)pending).length);
+        assertEquals(0, ((Delete)pending).index);
+    }
+
+    @Test
+    public void testDeleteAfterDeleteNoOverlap() {
+        Change incoming = new Delete(4, 2);
+        Change pending = new Delete(0, 2);
+        incoming.applyOT(pending);
+        assertEquals(2, ((Delete)incoming).length);
+        assertEquals(2, ((Delete)incoming).index);
+        assertEquals(2, ((Delete)pending).length);
+        assertEquals(0, ((Delete)pending).index);
+    }
+
+    @Test
+    public void testDeleteAfterDeleteWithOverlap() {
+        Change incoming = new Delete(2, 2);
+        Change pending = new Delete(0, 3);
+        incoming.applyOT(pending);
+        assertEquals(1, ((Delete)incoming).length);
+        assertEquals(0, ((Delete)incoming).index);
+        assertEquals(2, ((Delete)pending).length);
+        assertEquals(0, ((Delete)pending).index);
+
+    }
+
+    @Test
+    public void testDeleteSamePlaceIncomingLonger() {
+        Change incoming = new Delete(1, 2);
+        Change pending = new Delete(1, 1);
+        incoming.applyOT(pending);
+        assertEquals(1, ((Delete)incoming).length);
+        assertEquals(1, ((Delete)incoming).index);
+        assertEquals(0, ((Delete)pending).length);
+        assertEquals(-1, ((Delete)pending).index);
+    }
+
+    @Test
+    public void testDeleteSamePlacePendingLonger() {
+        Change incoming = new Delete(1, 1);
+        Change pending = new Delete(1, 2);
+        incoming.applyOT(pending);
+        assertEquals(0, ((Delete)incoming).length);
+        assertEquals(-1, ((Delete)incoming).index);
+        assertEquals(1, ((Delete)pending).length);
+        assertEquals(1, ((Delete)pending).index);
+
+    }
+
+    @Test
+    public void testDeleteSameThing() {
+        Change incoming = new Delete(1, 1);
+        Change pending = new Delete(1, 1);
+        incoming.applyOT(pending);
+        assertEquals(0, ((Delete)incoming).length);
+        assertEquals(-1, ((Delete)incoming).index);
+        assertEquals(0, ((Delete)pending).length);
+        assertEquals(-1, ((Delete)pending).index);
+    }
+
+
 }
