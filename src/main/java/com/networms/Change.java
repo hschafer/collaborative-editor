@@ -23,7 +23,7 @@ public abstract class Change implements Comparable<Change> {
     }
 
     public void decrementIndex(int amount) {
-        this.index -= amount;
+        this.index = Math.max(0, this.index - amount);
     }
 
     public abstract void applyOT(Change change);

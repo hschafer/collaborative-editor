@@ -37,14 +37,6 @@ public class Delete extends Change {
         return second != null && second.isPresent();
     }
 
-    public void incrementIndex(int amount) {
-        this.index += amount;
-    }
-
-    public void decrementIndex(int amount) {
-        this.index = Math.max(0, this.index - amount);
-    }
-
     public void incrementLength(int amount) {
         this.length += amount;
     }
