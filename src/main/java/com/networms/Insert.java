@@ -26,14 +26,6 @@ public class Insert extends Change {
         return this.index + this.text.length();
     }
 
-    public void incrementIndex(int amount) {
-        this.index += amount;
-    }
-
-    public void decrementIndex(int amount) {
-        this.index = Math.max(0, this.index - amount);
-    }
-
     public String toString() {
         return "insert " + this.text + " @" + this.index;
     }
