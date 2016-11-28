@@ -3,41 +3,32 @@ package com.networms;
 import java.util.*;
 
 public class Document {
-    long ID;
-    List<Character> contents;
-    // TODO: DocManager has worklist?
-    Queue<Change> worklist;
+    private List<Character> contents;
     // TODO: don't need version can just do history.size()?
-    int version;
-    List<Change> history;
+    private int version;
+    private List<Change> history;
 
-    public Document(long ID) {
-        this.ID = ID;
+    public Document() {
         this.contents = new ArrayList<>();
-        this.worklist = new PriorityQueue<>();
         this.version = 0;
         this.history = new ArrayList<>();
     }
-
-    // TODO: need separate thread to be listening to incoming changes and add them to worklist
-    // TODO: or should this be in the DocManager?
 
 
     // Takes next change in worklist (earliest change) and applies OT
     // on it to make it up to date to current contents.
     // Applies this change to the contents & sends appropriate acks
-    public void processNextChange() {
-        if (!this.worklist.isEmpty()) {
-            Change nextChange = this.worklist.remove();
-            for (int i = nextChange.version; i < this.version; i++) {
-                // TODO: this also changes the history? do we want that
-                nextChange.applyOT(this.history.get(i));
-            }
-            this.applyChangeToContents(nextChange);
-            this.history.add(nextChange);
-            this.version++;
+    // Returns new version of the document
+    public int processNextChange(Change nextChange) {
+        for (int i = nextChange.version; i < this.version; i++) {
+            // TODO: this also changes the history? do we want that
+            nextChange.applyOT(this.history.get(i));
         }
+        this.applyChangeToContents(nextChange);
+        this.history.add(nextChange);
+        return ++this.version;
     }
+
 
 
     // Takes in a change that has already had OT applied on it
@@ -56,5 +47,13 @@ public class Document {
                 this.contents.remove(startPos + i);
             }
         }
+    }
+
+    public int getVersion() {
+        return this.version;
+    }
+
+    public List<Character> getContents() {
+        return this.getContents();
     }
 }
