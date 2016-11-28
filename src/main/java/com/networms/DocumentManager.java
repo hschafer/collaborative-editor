@@ -29,9 +29,7 @@ public class DocumentManager {
     // If client is not attached to the doc, does nothing
     // (to be used by server when person closes page)
     public void removeClient(Client client) {
-        if (this.clients.contains(client)) {
-            this.clients.remove(client);
-        }
+        this.clients.remove(client);
     }
 
     // TODO: run this in a while(true) in main ?
