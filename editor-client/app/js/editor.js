@@ -13,27 +13,40 @@
         }
 
         toString() {
-            return "Insert(\"" + this.text + "\", @" + this.index + ")";
+            return "Insert(\"" + this.text + "\", @" + this.index + ", " + this.getEndIndex() + ")";
         }
 
-        transform(change) {
-            change.transformInsert(this);
+	getEndIndex() {
+	    return this.index + this.text.length;
+	}
+
+	incrementIndex(amount) {
+            this.index = this.index + amount;
         }
 
-        transformInsert(other) {
-            var transformedIndex = other.index;
-            if (other.index >= this.index) {
-                transformedIndex = this.text.length + other.index;
+        decrementIndex(amount) {
+            this.index = Math.max(0, this.index - amount);
+        }
+
+	transform(change) {
+    	    if (change instanceof Insert) {
+                if (change.index >= this.index) {
+                    change.incrementIndex(this.text.length);
+                } else {
+            	    this.incrementIndex(change.text.length);
+                }
+            } else {
+                if (change.index >= this.index) {
+                    change.incrementIndex(this.text.length);
+                } else if (this.index >= change.getEndIndex()) {
+                    // not overlapping
+                    this.decrementIndex(curr.text.length);
+                } else {
+                    // if inserting in the middle of stuff about to be deleted
+                    // just make the insert to the beginning of deletion
+                    this.index = change.index;
+                }
             }
-            return new Insert(other.text, transformedIndex);
-        }
-
-        transformDelete(other) {
-            var transformedIndex = other.index;
-            if (other.index >= this.index) {
-                transformedIndex = this.index + other.index;
-            }
-            return new Delete(other.length, transformedIndex);
         }
 
         apply(docText) {
@@ -49,6 +62,14 @@
 
         toString() { 
             return "Delete(" + this.length + ", @" + this.index + ")";
+        }
+        
+        incrementIndex(amount) {
+            this.index = this.index + amount;
+        }
+
+        decrementIndex(amount) {
+            this.index = Math.max(0, this.index - amount);
         }
 
         // Transform this Delete in respect to the given change
@@ -100,8 +121,13 @@
 
         button = $("#dTest");
         button.click(function(e) {
-            var testDelete = new Delete(1, 10);
-            applyChange(testDelete);
+            var firstInsert = new Insert("Hunter", 10);
+	    var secondInsert = new Insert("Andrew", 20);
+            console.log(firstInsert.toString());
+            console.log(secondInsert.toString());
+            firstInsert.transform(secondInsert);
+            console.log(firstInsert.toString());
+            console.log(secondInsert.toString());
         });
 
     };
