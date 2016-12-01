@@ -6,32 +6,54 @@
     var PENDING_LIST = [];
     var SENT_ITEM = null;
 
-    class Insert {
-        constructor(text, index) {
-            this.text = text;
+    class Change {
+        constructor(time, index, version) {
+            this.time = time;
             this.index = index;
+            this.version = version;
+        }
+
+        incrementIndex(amount) {
+            this.index = this.index + amount;
+        }
+
+        decrementIndex(amount) {
+            this.index = Math.max(0, this.index - amount);
+        }        
+    }
+
+    class Insert extends Change {
+        constructor(text, time, index, version) {
+            super(time, index, version);
+            this.text = text;
         }
 
         toString() {
-            return "Insert(\"" + this.text + "\", @" + this.index + ")";
+            return "Insert(\"" + this.text + "\", @" + super.index + ", " + this.getEndIndex() + ")";
         }
 
-        transform(change) {
-            change.transformInsert(this);
-        }
+	    getEndIndex() {
+	        return super.index + this.text.length;
+	    }
 
-        transformInsert(other) {
-            var transformedIndex = other.index;
-            if (other.index >= this.index) {
-                transformedIndex = this.text.length + other.index;
-            }
-            return new Insert(other.text, transformedIndex);
-        }
-
-        transformDelete(other) {
-            var transformedIndex = other.index;
-            if (other.index >= this.index) {
-                transformedIndex = this.index + other.index;
+    	transform(change) {
+    	    if (change instanceof Insert) {
+                if (change.index >= this.index) {
+                    change.incrementIndex(this.text.length);
+                } else {
+            	    this.incrementIndex(change.text.length);
+                }
+            } else {
+                if (change.index >= this.index) {
+                    change.incrementIndex(this.text.length);
+                } else if (this.index >= change.getEndIndex()) {
+                    // not overlapping
+                    this.decrementIndex(curr.text.length);
+                } else {
+                    // if inserting in the middle of stuff about to be deleted
+                    // just make the insert to the beginning of deletion
+                    this.index = change.index;
+                }
             }
             return new Delete(other.length, transformedIndex);
         }
@@ -41,53 +63,113 @@
         }
     }
 
-    class Delete {
-        constructor(length, index) {
+    class Delete extends Change {
+        constructor(length, time, index, version) {
+            super(time, index, version)
             this.length = length;
-            this.index = index;
+            this.second = null;
         }
 
         toString() { 
             return "Delete(" + this.length + ", @" + this.index + ")";
         }
 
-        // Transform this Delete in respect to the given change
-        transform(change) {
-            change.transformDelete(this);
+        hasSecond() {
+            return this.second != null;
         }
 
-        transformInsert(other) {
-            var transformedIndex = other.index;
-            if (other.index >= this.index && other.index < this.index + this.length) {
-                // TODO: Likely OBOB here
-                transformedIndex = this.index;
-            } else if (other.index >= this.index) {
-                transformedIndex = other.index - this.length;
-            }
-            return new Insert(other.text, transformedIndex);
+        incrementLength(amount) {
+            this.length += amount;
         }
 
-        // transform other in respect to mej
-        transformDelete(other) {
-            if (other.index >= this.index && other.index < this.index + this.length) {
-                if (other.index + other.length < this.index + this.length) {
-                    return new Delete(0, 0);
+        decrementLength(amount) {
+            return Math.max(0, this.length - amount)
+        }
+
+        getEndIndex() {
+            return this.length + super.index;
+        }
+
+        applyOT(change) {
+            if (change instanceof Insert) {
+                if (change.index > this.index) {
+                    if (this.getEndIndex() > change.index) {
+                        // overlap
+                        nonOverlapSize = change.index - this.index;
+                        change.decrementIndex(nonOverlapSize);
+                        secondLength = this.length - nonOverlapSize;
+                        this.length = nonOverlapSize;
+                        this.second = new Delete(change.getEndIndex(), secondLength);
+                    } else {
+                        // no overlap
+                        change.decrementIndex(this.length);
+                    }
                 } else {
-                    var newLength = (other.index + other.lenght) - (this.index + this.length);
-                    return new Delete(this.index + this.length, newLength);
+                    super.incrementIndex(change.text.length);
                 }
-            } else if (other.index > this.index) {
-                return new Delete(other.index - this.length, other.length);
             } else {
-                return new Delete(other.index, other.length);
-                // TODO transform me
+                // no overlap
+                if (change.index >= this.getEndIndex()) {
+                    change.decrementIndex(this.length);
+                } else if (this.index >= change.getEndIndex()) {
+                    this.decrementIndex(currDelete.length);
+                } else {
+                    // overlap
+                    if (this.equals(change)) {
+                        // exact same deletion
+                        this.makeEmptyDelete();
+                        currDelete.makeEmptyDelete();
+                    } else if (change.index == this.index) {
+                        if (change.length < this.length) {
+                            // curr ends first
+                            this.index = change.index;
+                            this.decrementLength(change.length);
+                            change.makeEmptyDelete();
+                        } else {
+                            change.index = this.index;
+                            change.decrementLength(this.length);
+                            this.makeEmptyDelete();
+                        }
+                    } else if (change.index < this.index) {
+                        deleteDelete(currDelete, this);
+                    } else {
+                        deleteDelete(this, currDelete);
+                    }
+                }
             }
         }
 
+        
+        makeEmptyDelete() {
+            super.index = -1;
+            this.length = 0;
+            this.secondDelete = null;
+        }
+       
         apply(docText) {
             return docText.substring(0, this.index) + docText.substring(this.index + this.length);
         }
     }
+
+    deleteDelete(c1, c2) {
+        if (c1.getEndIndex() <= c2.getEndIndex()) {
+            // cur starts before iC starts & ends at or before iC end
+            oldC2Index = c2.index;
+            oldC2Endex = c2.getEndIndex();
+            oldC1Index = c1.index;
+            oldC2Length = c2.length;
+            c2.index = c1.getEndIndex() - c1.length;
+            c2.length = (oldC2Endex - c1.index) - c1.length;
+            c1.index = oldC2Index - (oldC2Index - c1.index);
+            c1.length = (oldC2Endex - oldC1Index) - oldC2Length;
+        } else {
+            // curr starts before iC, ends after iC
+            // iC is completely devoured
+            c1.decrementLength(c1.length);
+            c2.makeEmptyDelete();
+        }
+    }
+
 
     window.onload = function() {
         setupInputListeners();
@@ -100,8 +182,17 @@
 
         button = $("#dTest");
         button.click(function(e) {
-            var testDelete = new Delete(1, 10);
-            applyChange(testDelete);
+            var firstInsert = new Insert("Hunter", 10, 3, 5);
+	        var secondInsert = new Insert("Andrew", 20, 4, 6);
+            var secondChange = new Change(4, 5, 6);
+            console.log("first insert index:", firstInsert.index);
+            console.log("second change index:",  secondChange);
+            console.log(firstInsert.toString());
+            console.log(secondInsert.toString());
+            console.log(secondInsert.index);
+            firstInsert.transform(secondInsert);
+            console.log(firstInsert.toString());
+            console.log(secondInsert.toString());
         });
 
     };
