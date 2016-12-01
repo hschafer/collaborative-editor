@@ -21,8 +21,13 @@ public class Document {
     // Returns new version of the document
     public int processNextChange(Change nextChange) {
         for (int i = nextChange.version; i < this.version; i++) {
-            // TODO: this also changes the history? do we want that
-            nextChange.applyOT(this.history.get(i));
+            Change copyOfHistoryChange;
+            if (this.history.get(i) instanceof Insert) {
+                copyOfHistoryChange = new Insert((Insert)this.history.get(i));
+            } else {
+                copyOfHistoryChange = new Delete((Delete)this.history.get(i));
+            }
+            nextChange.applyOT(copyOfHistoryChange);
         }
         this.applyChangeToContents(nextChange);
         this.history.add(nextChange);

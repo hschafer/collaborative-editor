@@ -1,18 +1,24 @@
 package com.networms;
 
+import java.net.Socket;
+
 public class Insert extends Change {
     private String text;
 
 
     // should be used for testing purposes only ?
     public Insert(int index, String text) {
-        this(index, text, 1, null);
+        this(index, text, 0, 1, null);
     }
 
-    public Insert(int index, String text, int version, Client sender) {
+    public Insert(Insert other) {
+        this(other.index, other.text, 0, other.version, other.sender);
+    }
+
+    public Insert(int index, String text, long currTime, int version, Socket sender) {
         this.index = index;
         this.text = text;
-        this.time = System.currentTimeMillis();
+        this.time = currTime;
         this.version = version;
         this.sender = sender;
     }

@@ -1,10 +1,12 @@
 package com.networms;
 
+import java.net.Socket;
+
 public abstract class Change implements Comparable<Change> {
     long time;
     int index;
     int version;
-    Client sender;
+    Socket sender;
 
     public int getIndex() {
         return index;
@@ -27,7 +29,7 @@ public abstract class Change implements Comparable<Change> {
         this.index = Math.max(0, this.index - amount);
     }
 
-    public Client getSender() {
+    public Socket getSender() {
         return this.sender;
     }
 
