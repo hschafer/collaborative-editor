@@ -58,7 +58,7 @@ public class Insert extends Change {
             } else {
                 // if inserting in the middle of stuff about to be deleted
                 // just make the insert to the beginning of deletion
-                this.index = currDelete.getIndex();
+            	currDelete.applyOT(this);
             }
         }
     }

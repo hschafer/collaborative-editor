@@ -54,6 +54,23 @@ public class OTTest {
         assertEquals(1, pending.getIndex());
         assertEquals("hello", pending.getText());
     }
+    
+    @Test
+    public void testDeleteBeforeInsertWithOverlapInsertIsIncoming() {
+    	Insert incoming = new Insert(3, "hello");
+    	Delete pending = new Delete(1, 3);
+        incoming.applyOT(pending);
+
+        assertEquals(1, incoming.getIndex());
+        assertEquals("hello", incoming.getText());
+        assertEquals(1, pending.getIndex());
+        assertEquals(2, pending.getLength());
+        assertTrue(pending.hasSecond());
+
+        Delete second = pending.getSecond().get();
+        assertEquals(6, second.getIndex());
+        assertEquals(1, second.getLength());
+    }
 
     @Test
     public void testDeleteBeforeInsertWithOverlap() {
