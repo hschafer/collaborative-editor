@@ -5,14 +5,12 @@ import java.util.concurrent.BlockingQueue;
 
 public class DocumentManager implements Runnable {
     // TODO: potentially unnecessary
-    private long ID;
     private BlockingQueue<Change> worklist;
     private BlockingQueue<Change> acklist;
     private Document doc;
 
-    public DocumentManager(long ID, BlockingQueue<Change> worklist,
+    public DocumentManager(BlockingQueue<Change> worklist,
                            BlockingQueue<Change> acklist) {
-        this.ID = ID;
         this.worklist = worklist;
         this.acklist = acklist;
         this.doc = new Document();

@@ -5,22 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class ClientManager implements Runnable{
-    // TODO: potentially unnecessary
-    private long ID;
     private BlockingQueue<Change> worklist;
     private BlockingQueue<Change> acklist;
-    public List<Socket> clients;
+    public final List<Socket> clients;
 
-    public ClientManager(long ID, BlockingQueue<Change> worklist,
+    public ClientManager(BlockingQueue<Change> worklist,
                          BlockingQueue<Change> acklist) {
-        this.ID = ID;
         this.worklist = worklist;
         this.acklist = acklist;
-        this.clients = new ArrayList<>();
+        this.clients = Collections.synchronizedList(new ArrayList<>());
     }
 
     public void run() {
@@ -39,25 +37,28 @@ public class ClientManager implements Runnable{
                 }
                 Ack forSender = new Ack(toAck.version);
                 Ack forOthers = new Ack(toAck.version, toAck);
-                for (Socket client : clients) {
-                    // send ack to each client
-                    try {
-                        DataOutputStream output = new DataOutputStream(client.getOutputStream());
-                        if (client == toAck.getSender()) {
-                            output.writeBytes(mapper.writeValueAsString(forSender));
-                        } else {
-                            output.writeBytes(mapper.writeValueAsString(forOthers));
+                synchronized(clients) {
+                    for (Socket client : clients) {
+                        // send ack to each client
+                        try {
+                            DataOutputStream output = new DataOutputStream(client.getOutputStream());
+                            if (client == toAck.getSender()) {
+                                output.writeBytes(mapper.writeValueAsString(forSender));
+                            } else {
+                                output.writeBytes(mapper.writeValueAsString(forOthers));
+                            }
+                        } catch (IOException io) {
+                            io.printStackTrace();
                         }
-                    } catch (IOException io) {
-                        io.printStackTrace();
-                        continue;
                     }
                 }
             }
-            for (Socket client : clients) {
-                try {
-                    BufferedReader input = new BufferedReader(new InputStreamReader((client.getInputStream())));
-                    if (input.ready()) {
+            synchronized(clients) {
+                for (Socket client : clients) {
+                    try {
+                        BufferedReader input = new BufferedReader(new InputStreamReader((client.getInputStream())));
+                        // TODO: check if socket is closed and remove it ?
+                        if (input.ready()) {
                             // client has change to be read
                             String incomingChange = input.readLine();
                             Change incoming = null;
@@ -68,10 +69,10 @@ public class ClientManager implements Runnable{
                             }
                             this.worklist.offer(incoming);
 
+                        }
+                    } catch (IOException io) {
+                        io.printStackTrace();
                     }
-                } catch (IOException io) {
-                    io.printStackTrace();
-                    continue;
                 }
             }
         }
