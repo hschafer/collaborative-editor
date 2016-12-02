@@ -1,4 +1,6 @@
 "use strict";
+var Change = require('change');
+
 (function() {
     var BACKSPACE_CODE = 8;
     var DELETE_CODE = 46;
