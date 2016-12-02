@@ -150,7 +150,7 @@
         }
     }
 
-    deleteDelete(c1, c2) {
+    function deleteDelete(c1, c2) {
         if (c1.getEndIndex() <= c2.getEndIndex()) {
             // cur starts before iC starts & ends at or before iC end
             oldC2Index = c2.index;
