@@ -1,66 +1,12 @@
 "use strict";
+var Change = require('change');
+
 (function() {
     var BACKSPACE_CODE = 8;
     var DELETE_CODE = 46;
     
     var PENDING_LIST = [];
     var SENT_ITEM = null;
-
-    class Change {
-        constructor(time, index, version) {
-            this.time = time;
-            this.index = index;
-            this.version = version;
-        }
-
-        incrementIndex(amount) {
-            this.index = this.index + amount;
-        }
-
-        decrementIndex(amount) {
-            this.index = Math.max(0, this.index - amount);
-        }        
-    }
-
-    class Insert extends Change {
-        constructor(text, time, index, version) {
-            super(time, index, version);
-            this.text = text;
-        }
-
-        toString() {
-            return "Insert(\"" + this.text + "\", @" + super.index + ", " + this.getEndIndex() + ")";
-        }
-
-	    getEndIndex() {
-	        return super.index + this.text.length;
-	    }
-
-    	transform(change) {
-    	    if (change instanceof Insert) {
-                if (change.index >= this.index) {
-                    change.incrementIndex(this.text.length);
-                } else {
-            	    this.incrementIndex(change.text.length);
-                }
-            } else {
-                if (change.index >= this.index) {
-                    change.incrementIndex(this.text.length);
-                } else if (this.index >= change.getEndIndex()) {
-                    // not overlapping
-                    this.decrementIndex(curr.text.length);
-                } else {
-                    // if inserting in the middle of stuff about to be deleted
-                    // just make the insert to the beginning of deletion
-                    this.index = change.index;
-                }
-            }
-        }
-
-        apply(docText) {
-            return docText.substring(0, this.index) + this.text + docText.substring(this.index);
-        }
-    }
 
     class Delete extends Change {
         constructor(length, time, index, version) {

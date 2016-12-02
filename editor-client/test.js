@@ -1,10 +1,11 @@
 import { describe, before, it } from 'mocha';
 import {expect, assert, should} from 'chai';
-import Person from './app/js/person';
+import Insert from './app/js/insert';
+import Delete from './app/js/delete';
 
 describe('Hello World', function () {
     it('should increment a value', function () {
-        var andrew = new Person("andrew", "dawson");
-        assert.equal("andrew", andrew.get(), "dog");
+        var insert = new Insert(1, 2, 3, 4);
+        assert.equal(2, insert.index, "dog");
     });
 });
