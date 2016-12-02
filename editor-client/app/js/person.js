@@ -1,6 +1,5 @@
 'use strict';
-
-module.exports = class Person {
+export default class Person {
     constructor(firstName, lastName) {
         this.firstName = firstName;
         this.lastName = lastName;   
