@@ -1,5 +1,5 @@
 "use strict"
-import Change from 'change';
+import Change from './change';
 
 export default class Insert extends Change {
     constructor(text, time, index, version) {

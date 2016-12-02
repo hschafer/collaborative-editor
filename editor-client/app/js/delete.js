@@ -1,5 +1,5 @@
 "use strict";
-var Change = require('change');
+import Change from './change';
 
 class Delete extends Change {
     constructor(length, time, index, version) {
