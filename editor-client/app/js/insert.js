@@ -2,7 +2,7 @@
 import Change from './change';
 
 export default class Insert extends Change {
-    constructor(text, time, index, version) {
+    constructor(index, text, time, version) {
         super(time, index, version);
         this.text = text;
     }
@@ -12,10 +12,10 @@ export default class Insert extends Change {
     }
 
     getEndIndex() {
-        return super.index + this.text.length;
+        return this.index + this.text.length;
     }
 
-	transform(change) {
+	applyOT(change) {
 	    if (change instanceof Insert) {
             if (change.index >= this.index) {
                 change.incrementIndex(this.text.length);
@@ -31,7 +31,8 @@ export default class Insert extends Change {
             } else {
                 // if inserting in the middle of stuff about to be deleted
                 // just make the insert to the beginning of deletion
-                this.index = change.index;
+                console.log("got here parent");
+                change.applyOT(this);
             }
         }
     }
