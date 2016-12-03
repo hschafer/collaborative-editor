@@ -14,9 +14,8 @@ gulp.task('build:server', function(done) {
 });
 
 gulp.task('build:app', function(done) {
-  return browserify({debug: true})
-    .transform(babelify)
-    .require('./app/js/editor.js', {entry: true})
+  return browserify({entries: './app/js/editor.js', debug: true})
+    .transform(babelify, {presets: ['es2015']})
     .bundle()
     .on('error', function handleError() {
       this.emit('end');
