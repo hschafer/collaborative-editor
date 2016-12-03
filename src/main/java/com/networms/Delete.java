@@ -1,5 +1,6 @@
 package com.networms;
 
+import java.net.Socket;
 import java.util.Optional;
 
 public class Delete extends Change {
@@ -8,13 +9,17 @@ public class Delete extends Change {
 
     // should be used for testing purposes only ?
     public Delete(int index, int length) {
-        this(index, length, 1, null);
+        this(index, length, 0, 1, null);
     }
 
-    public Delete(int index, int length, int version, Client sender) {
+    public Delete(Delete other) {
+        this(other.index, other.length, 0, other.version, other.sender);
+    }
+
+    public Delete(int index, int length, long currTime, int version, Socket sender) {
         this.index = index;
         this.length = length;
-        this.time = System.currentTimeMillis();
+        this.time = currTime;
         this.version = version;
         this.sender = sender;
     }
