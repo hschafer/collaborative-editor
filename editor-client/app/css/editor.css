@@ -1,0 +1,27 @@
+body {
+  background-color: #f5f5f5;
+}
+
+#header {
+  padding-left: 0.7em;
+  padding-right: 0.7em;
+}
+
+.dropdown-button.btn-flat {
+  text-transform: none;
+  padding: 0px;
+  margin-bottom: 0.7em;
+}
+
+#textbox {
+  background-color: #ffffff;
+  height: 450px;
+  resize: none;
+  border: none;
+}
+
+#textbox:focus {
+  outline-width: 0;
+}
+
+
