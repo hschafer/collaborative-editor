@@ -1,8 +1,10 @@
 var gulp = require('gulp');
-var nodemon = require('gulp-nodemon');
 var babel = require('gulp-babel');
+var babelify = require('babelify');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
 
-gulp.task('serve:build-server', function(done) {
+gulp.task('build:server', function(done) {
   return gulp.src('./server.js')
     .pipe(babel())
     .on('error', function handleError() {
@@ -11,23 +13,21 @@ gulp.task('serve:build-server', function(done) {
     .pipe(gulp.dest('./lib'));
 });
 
-gulp.task('serve:babel', function(done) {
-  return gulp.src('./app/**/*.js')
-    .pipe(babel())
-    .pipe(gulp.dest('./public/'));
+gulp.task('build:app', function(done) {
+  return browserify({debug: true})
+    .transform(babelify)
+    .require('./app/js/editor.js', {entry: true})
+    .bundle()
+    .on('error', function handleError() {
+      this.emit('end');
+    })
+    .pipe(source('editor.js'))
+    .pipe(gulp.dest('./public/js'));
 });
 
-gulp.task('serve:style', function(done) {
+gulp.task('build:style', function(done) {
   return gulp.src('./app/**/*.css')
     .pipe(gulp.dest('./public/'));
 });
 
-gulp.task('serve:run', function(done) {
-  nodemon({
-    exec: 'node ./lib/server.js',
-    watch: ['lib/server.js'],
-    ext: 'js html'
-  });
-});
-
-gulp.task('serve', ['serve:build-server', 'serve:babel', 'serve:style', 'serve:run']);
+gulp.task('build', ['build:server', 'build:app', 'build:style']);

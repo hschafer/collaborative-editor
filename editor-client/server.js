@@ -8,24 +8,25 @@ app.set('view engine', 'pug')
 app.set('views', './app/views')
 app.use('/static', express.static('public'))
 
+var SERVER_HOST = "localhost";
+var SERVER_PORT = 12345;
+
+var connection = net.connect(SERVER_PORT, SERVER_HOST, function() {
+    console.log("Successfully connected to backend server!");   
+});
+
 app.get('/', function(req, res, next) {
   console.log('Request: [GET]', req.originalUrl);
-  //var serverConnection = new net.Socket();
-  //client.connect(12345, 'attu1.cs.washington.edu', function() {
-  //  client.write('CONNECT');
-  //});
+  connection.write("0\r\n"); 
 
-  //client.on('data', function(data) {
-  //  console.log('Received docId =', data);
-  //  
-  //});
-  
-  var docId = 'abcd1234';
-  res.redirect('editor/' + docId); 
+  connection.on('data', function(data) {
+    console.log('Received docId =', data);
+    
+    res.redirect('editor/' + data); 
+  });
 });
 
 app.get('/editor/:docId', function(req, res, next) {
-  // TODO: get connection to this docId
   console.log('Request: [GET]', req.originalUrl);
   res.render('editor', {docId: req.params.docId}) 
 });
