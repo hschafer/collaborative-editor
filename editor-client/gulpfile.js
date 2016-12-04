@@ -17,16 +17,13 @@ gulp.task('build:app', function(done) {
   return browserify({entries: './app/js/editor.js', debug: true})
     .transform(babelify, {presets: ['es2015']})
     .bundle()
-    .on('error', function handleError() {
-      this.emit('end');
-    })
     .pipe(source('editor.js'))
     .pipe(gulp.dest('./public/js'));
 });
 
 gulp.task('build:style', function(done) {
-  return gulp.src('./app/**/*.css')
-    .pipe(gulp.dest('./public/'));
+  return gulp.src('./app/css/editor.css')
+    .pipe(gulp.dest('./public/css'));
 });
 
 gulp.task('build', ['build:server', 'build:app', 'build:style']);

@@ -1,9 +1,9 @@
 "use strict";
 // these are the lines that don't work in the broswer yet becuase require is part of node
 // we need to use broswerify or require js here and edit the gulpfile.js to add to the build pipeline
-var Change = require('change');
-var Insert = require('insert');
-var Delete = require('delete');
+var Change = require('./change.js').default;
+var Insert = require('./insert.js').default;
+var Delete = require('./delete.js').default;
 
 (function() {
     var BACKSPACE_CODE = 8;
@@ -12,9 +12,12 @@ var Delete = require('delete');
     var PENDING_LIST = [];
     var SENT_ITEM = null;
 
+    var SERVER_PORT = 8081;
+    var CONNECTION = null;
+
     window.onload = function() {
         setupInputListeners();
-        setupConnection();
+        CONNECTION = setupConnection();
         var button = $("#test");
         button.click(function(e) {
             var testInsert = new Insert("Hunter", 3);
@@ -49,6 +52,7 @@ var Delete = require('delete');
             var change = new Insert(key, position);
             console.log(change.toString(), e);
             PENDING_LIST.push(change);
+            sendChange();
         });
 
         textbox.keydown(function(e) {
@@ -74,17 +78,31 @@ var Delete = require('delete');
                 var change = new Delete(length, index);
                 console.log(change.toString(), e);
                 PENDING_LIST.push(change);
+                sendChange();
             }
         });
     }
 
     function setupConnection() {
-        //var port = 8888;
+        console.log("Attempting to set up connection");
 
-        //var serverConnection = new net.Socket();
-        //client.connect(port, 'attu1.cs.washington.edu', function() {
-        //    client.write('CONNECT');
-        //});
+        var docId = $("meta[name=docId]")[0].content;
+        //var connection = new WebSocket("ws://localhost:" + SERVER_PORT + "/" + docId);
+
+        //connection.onopen = function(event) {
+        //  console.log("Connection success!");
+        //  connection.send(docId);
+        //}
+
+        //connection.onerror = function(error) {
+        //  console.log("Error occurred", error);
+        //}
+
+        //connection.onmessage = function(event) {
+        //  console.log("Received data", event.data);
+        //}
+
+        //return connection;
 
         //client.on('data', function(data) {
         //    console.log('Received', data);
