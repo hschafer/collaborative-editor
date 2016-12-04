@@ -3,12 +3,12 @@ import Change from './change';
 
 export default class Insert extends Change {
     constructor(index, text, time, version) {
-        super(time, index, version);
+        super(time, index, version, "insert");
         this.text = text;
     }
 
     toString() {
-        return "Insert(\"" + this.text + "\", @" + super.index + ", " + this.getEndIndex() + ")";
+        return "Insert(\"" + this.text + "\", @" + this.index + ", " + this.getEndIndex() + ", v: " + this.version + ")";
     }
 
     getEndIndex() {
@@ -27,7 +27,7 @@ export default class Insert extends Change {
                 change.incrementIndex(this.text.length);
             } else if (this.index >= change.getEndIndex()) {
                 // not overlapping
-                this.decrementIndex(curr.text.length);
+                this.decrementIndex(change.length);
             } else {
                 // if inserting in the middle of stuff about to be deleted
                 // just make the insert to the beginning of deletion

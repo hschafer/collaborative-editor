@@ -1,9 +1,10 @@
 "use strict"
 export default class Change {
-    constructor(time, index, version) {
+    constructor(time, index, version, type) {
         this.time = time;
         this.index = index;
         this.version = version;
+        this.type = type;
     }
 
     incrementIndex(amount) {

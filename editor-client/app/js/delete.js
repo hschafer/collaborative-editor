@@ -4,13 +4,13 @@ import Insert from './insert';
 
 export default class Delete extends Change {
     constructor(index, length, time, version) {
-        super(time, index, version);
+        super(time, index, version, "delete");
         this.length = length;
         this.second = null;
     }
 
     toString() { 
-        return "Delete(" + this.length + ", @" + this.index + ")";
+        return "Delete(" + this.length + ", @" + this.index + ", v: " + this.version + ")";
     }
 
     hasSecond() {
@@ -22,14 +22,14 @@ export default class Delete extends Change {
     }
 
     decrementLength(amount) {
-        this.length =  Math.max(0, this.length - amount)
+        this.length = Math.max(0, this.length - amount)
     }
 
     getEndIndex() {
         return this.length + this.index;
     }
 
-    equals(object) {
+    sameDelete(object) {
         return object.index == this.index && object.length == this.length;
     } 
 
@@ -58,14 +58,13 @@ export default class Delete extends Change {
                 this.decrementIndex(change.length);
             } else {
                 // overlap
-                if (this.equals(change)) {
+                if (this.sameDelete(change)) {
                     // exact same deletion
                     makeEmptyDelete(this);
                     makeEmptyDelete(change);
                 } else if (change.index == this.index) {
                     if (change.length < this.length) {
                         // curr ends first
-                        console.log("right here");
                         this.index = change.index;
                         this.decrementLength(change.length);
                         makeEmptyDelete(change);
@@ -84,6 +83,7 @@ export default class Delete extends Change {
     }
 
     apply(docText) {
+        // TODO: We need to deal with second delete here
         return docText.substring(0, this.index) + docText.substring(this.index + this.length);
     }
 }
