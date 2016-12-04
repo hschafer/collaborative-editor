@@ -67,6 +67,9 @@ public class ClientManager implements Runnable{
                 Ack forSender = new Ack(toAck.version);
                 Ack forOthers = new Ack(toAck.version, toAck);
                 synchronized(clients) {
+                    int numContributers = clients.size();
+                    forSender.setContributers(numContributers);
+                    forOthers.setContributers(numContributers);
                     for (WebSocket client : clients) {
                         // send ack to each client
                         try {
