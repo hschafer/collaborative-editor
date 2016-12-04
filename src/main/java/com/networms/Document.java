@@ -20,20 +20,21 @@ public class Document {
     // Applies this change to the contents & sends appropriate acks
     // Returns new version of the document
     public int processNextChange(Change nextChange) {
-        for (int i = nextChange.version; i < this.version; i++) {
+        for (int i = nextChange.version - 1; i < this.version; i++) {
             Change copyOfHistoryChange;
             if (this.history.get(i) instanceof Insert) {
                 copyOfHistoryChange = new Insert((Insert)this.history.get(i));
             } else {
                 copyOfHistoryChange = new Delete((Delete)this.history.get(i));
             }
-            nextChange.applyOT(copyOfHistoryChange);
+            copyOfHistoryChange.applyOT(nextChange);
         }
+
         this.applyChangeToContents(nextChange);
         this.history.add(nextChange);
+        System.out.println(contents);
         return ++this.version;
     }
-
 
 
     // Takes in a change that has already had OT applied on it
@@ -44,12 +45,21 @@ public class Document {
         if (nextChange instanceof Insert) {
             String text = ((Insert) nextChange).getText();
             for (int i = 0; i < text.length(); i++) {
-                this.contents.add(startPos + i, text.charAt(i));
+                if (startPos + i < this.contents.size()) {
+                    this.contents.add(startPos + i, text.charAt(i));
+                } else {
+                    this.contents.add(text.charAt(i));
+                }
             }
+
         } else {
             int length = ((Delete) nextChange).getLength();
-            for (int i = 0; i < length; i++) {
-                this.contents.remove(startPos + i);
+            if (nextChange.getIndex() != -1) {
+                for (int i = length - 1; i >= 0; i--) {
+                    if (startPos + i < this.contents.size()) {
+                        this.contents.remove(startPos + i);
+                    }
+                }
             }
         }
     }
@@ -59,6 +69,6 @@ public class Document {
     }
 
     public List<Character> getContents() {
-        return this.getContents();
+        return this.contents;
     }
 }

@@ -1,11 +1,9 @@
 package com.networms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.deser.std.DelegatingDeserializer;
 import org.java_websocket.WebSocket;
 
 import java.io.*;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,8 +23,14 @@ public class ClientManager implements Runnable{
 
     public void addClient(WebSocket client) {
         // Since this is synchronized this should be safe :D
-        synchronized (clients) {
+        synchronized (this.clients) {
             this.clients.add(client);
+        }
+    }
+
+    public void removeClient(WebSocket client) {
+        synchronized (this.clients) {
+            this.clients.remove(client);
         }
     }
 
@@ -34,14 +38,15 @@ public class ClientManager implements Runnable{
         ObjectMapper mapper = new ObjectMapper();
         mapper.enableDefaultTyping();
         try {
-            Class<? extends Change> type = message.contains("insert") ? Insert.class : Delete.class;
-            Change incoming = mapper.readValue(message, type);
+            Change incoming = mapper.readValue(message, Change.class);
+            incoming.setSender(client);
             System.out.println("Received change: " + incoming);
             this.worklist.offer(incoming);
         } catch (IOException e) {
             System.out.println(e);
         }
     }
+
 
     public void run() {
         ObjectMapper mapper = new ObjectMapper();

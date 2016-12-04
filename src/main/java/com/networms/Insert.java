@@ -1,6 +1,6 @@
 package com.networms;
 
-import java.net.Socket;
+import org.java_websocket.WebSocket;
 
 public class Insert extends Change {
     private String text;
@@ -17,7 +17,7 @@ public class Insert extends Change {
         this(other.index, other.text, 0, other.version, other.sender);
     }
 
-    public Insert(int index, String text, long currTime, int version, Socket sender) {
+    public Insert(int index, String text, long currTime, int version, WebSocket sender) {
         this.index = index;
         this.text = text;
         this.time = currTime;
@@ -38,7 +38,7 @@ public class Insert extends Change {
     }
 
     public String toString() {
-        return "insert " + this.text + " @" + this.index;
+        return "insert " + this.text + " @" + this.index + " version: " + this.version;
     }
 
     @Override

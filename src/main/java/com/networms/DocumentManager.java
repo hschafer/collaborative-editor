@@ -1,6 +1,7 @@
 package com.networms;
 
 
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class DocumentManager implements Runnable {
@@ -33,5 +34,14 @@ public class DocumentManager implements Runnable {
             acklist.offer(toProcess);
 
         }
+    }
+
+    public String getContentsAndVersion() {
+        List<Character> contents = this.doc.getContents();
+        String ret = "";
+        for(char c : contents) {
+            ret += c;
+        }
+        return this.doc.getVersion() + "," + ret;
     }
 }

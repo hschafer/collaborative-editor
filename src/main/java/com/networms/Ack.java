@@ -1,9 +1,11 @@
 package com.networms;
 
+
 /**
  * Simple class to represent an ack sent from DocManager
  * to Client
  */
+
 public class Ack {
     private int version;
     private Change ackedChange;

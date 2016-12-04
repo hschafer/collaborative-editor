@@ -23,7 +23,9 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public class TestServer extends WebSocketServer {
     private Map<WebSocket, ClientManager> currentConnections;
+    private static Map<Long, DocumentManager> idToDM;
     private static Map<Long, ClientManager> idToCM = new HashMap<>();
+    private static Map<Long, DocHelpers> idToDocHelp;
 
     public TestServer(int port) throws UnknownHostException {
         this(new InetSocketAddress(port));
@@ -32,6 +34,7 @@ public class TestServer extends WebSocketServer {
     public TestServer(InetSocketAddress addr) {
         super(addr);
         this.currentConnections = new HashMap<>();
+        this.idToDM = new HashMap<>();
     }
 
     @Override
@@ -47,11 +50,13 @@ public class TestServer extends WebSocketServer {
         ClientManager clientManager = idToCM.get(docID);
         clientManager.addClient(webSocket);
         currentConnections.put(webSocket, clientManager);
+        webSocket.send(idToDM.get(docID).getContentsAndVersion());
     }
 
     @Override
     public void onClose(WebSocket client, int i, String s, boolean b) {
         System.out.println("Closing connection to " + client);
+        currentConnections.get(client).removeClient(client);
         currentConnections.remove(client);
     }
 
@@ -123,6 +128,7 @@ public class TestServer extends WebSocketServer {
         DocumentManager docMgr = new DocumentManager(worklist, acklist);
         ClientManager clientMgr = new ClientManager(worklist, acklist);
         idToCM.put(docID, clientMgr);
+        idToDM.put(docID, docMgr);
         new Thread(docMgr).start();
         new Thread(clientMgr).start();
     }
