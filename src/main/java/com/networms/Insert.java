@@ -5,6 +5,8 @@ import java.net.Socket;
 public class Insert extends Change {
     private String text;
 
+    public Insert() {
+    }
 
     // should be used for testing purposes only ?
     public Insert(int index, String text) {

@@ -12,6 +12,15 @@ public abstract class Change implements Comparable<Change> {
         return index;
     }
 
+    public long getTime() {
+        return time;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+
     public void setIndex(int index) {
         this.index = index;
     }

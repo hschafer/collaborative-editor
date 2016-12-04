@@ -7,6 +7,9 @@ public class Delete extends Change {
     private int length;
     private Optional<Delete> second;
 
+    public Delete() {
+    }
+
     // should be used for testing purposes only ?
     public Delete(int index, int length) {
         this(index, length, 0, 1, null);
