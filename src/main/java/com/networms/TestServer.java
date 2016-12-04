@@ -1,7 +1,6 @@
 package com.networms;
 
 import org.java_websocket.WebSocket;
-import org.java_websocket.WebSocketImpl;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
@@ -23,30 +22,45 @@ import java.util.concurrent.PriorityBlockingQueue;
  * Created by Hunter on 12/3/16.
  */
 public class TestServer extends WebSocketServer {
+    private Map<WebSocket, ClientManager> currentConnections;
+    private static Map<Long, ClientManager> idToCM = new HashMap<>();
 
     public TestServer(int port) throws UnknownHostException {
-        super(new InetSocketAddress(port));
+        this(new InetSocketAddress(port));
     }
 
     public TestServer(InetSocketAddress addr) {
         super(addr);
+        this.currentConnections = new HashMap<>();
     }
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         System.out.println("Resource desc: " + clientHandshake.getResourceDescriptor());
-        System.out.print("Local addr: " + webSocket.getLocalSocketAddress().getAddress().getHostAddress());
-        System.out.println(webSocket.getRemoteSocketAddress().getAddress().getHostAddress() + " entered the room!" );
+
+        String id = clientHandshake.getResourceDescriptor().substring(1);
+        long docID = Long.parseLong(id);
+        if (!idToCM.containsKey(docID)) {
+            createDocument(docID);
+        }
+
+        ClientManager clientManager = idToCM.get(docID);
+        clientManager.addClient(webSocket);
+        currentConnections.put(webSocket, clientManager);
     }
 
     @Override
-    public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-
+    public void onClose(WebSocket client, int i, String s, boolean b) {
+        System.out.println("Closing connection to " + client);
+        currentConnections.remove(client);
     }
 
     @Override
-    public void onMessage(WebSocket webSocket, String s) {
-        System.out.println("Received message: " + s);
+    public void onMessage(WebSocket client, String message) {
+        System.out.println("Received message: " + message);
+        ClientManager clientManager = currentConnections.get(client);
+        assert clientManager != null;
+        clientManager.receiveMessage(client, message);
     }
 
     @Override
@@ -55,8 +69,7 @@ public class TestServer extends WebSocketServer {
     }
 
     public static void main(String[] args) throws IOException {
-        Map<Long, ClientManager> idToCM = new HashMap<>();
-
+        System.out.println("Starting Server");
         ServerSocket acceptor = new ServerSocket(12345);
         // right now node server calls connect twice which is being fixed
         // first socket will be node server & this blocks
@@ -86,13 +99,7 @@ public class TestServer extends WebSocketServer {
                 if (!idToCM.containsKey(requestedID)) {
                     // either client passed in specific new id or we have generated one
                     // new doc with new queues
-                    BlockingQueue<Change> worklist = new PriorityBlockingQueue<>();
-                    BlockingQueue<Change> acklist = new PriorityBlockingQueue<>();
-                    DocumentManager docMgr = new DocumentManager(worklist, acklist);
-                    ClientManager clientMgr = new ClientManager(worklist, acklist);
-                    idToCM.put(requestedID, clientMgr);
-                    new Thread(docMgr).start();
-                    new Thread(clientMgr).start();
+                    createDocument(requestedID);
                 }
                 // ack the creation or verification of docID
                 System.out.println("Sending back to FE server: " + requestedID);
@@ -108,5 +115,15 @@ public class TestServer extends WebSocketServer {
             id = (long)(Long.MAX_VALUE * Math.random());
         }
         return id;
+    }
+
+    private static void createDocument(long docID) {
+        BlockingQueue<Change> worklist = new PriorityBlockingQueue<>();
+        BlockingQueue<Change> acklist = new PriorityBlockingQueue<>();
+        DocumentManager docMgr = new DocumentManager(worklist, acklist);
+        ClientManager clientMgr = new ClientManager(worklist, acklist);
+        idToCM.put(docID, clientMgr);
+        new Thread(docMgr).start();
+        new Thread(clientMgr).start();
     }
 }
