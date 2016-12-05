@@ -16,28 +16,17 @@ var SERVER_PORT = 12345;
 app.get('/', function(req, res, next) {
   console.log('Request: [GET]', req.originalUrl);
 
-  async.parallel([
-    function(callback) {
-      var connection = net.connect(SERVER_PORT, SERVER_HOST, function() {
-        console.log("Successfully connected to backend server!");
-        connection.write("0\r\n");
-      });
+  var connection = net.connect(SERVER_PORT, SERVER_HOST, function() {
+    console.log("Successfully connected to backend server!");
+    connection.write("0\r\n");
+  });
 
 
-      connection.on('data', function(data) {
-        console.log('Received docId = ' + data);
-        callback(false, data);
-      });
-    }],
-    function(err, results) {
-      if (err) {
-        console.log(error);
-        res.send(500, "Server Error");
-        return;
-      }
-      res.redirect('editor/' + results[0]);
-    });
-});
+  connection.on('data', function(data) {
+    console.log('Received docId = ' + data);
+    res.redirect('editor/' + data);
+  });
+}
 
 app.get('/editor/:docId', function(req, res, next) {
   console.log('Request: [GET]', req.originalUrl);
