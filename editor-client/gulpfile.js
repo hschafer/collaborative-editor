@@ -7,9 +7,6 @@ var source = require('vinyl-source-stream');
 gulp.task('build:server', function(done) {
   return gulp.src('./server.js')
     .pipe(babel())
-    .on('error', function handleError() {
-      this.emit('end');
-    })
     .pipe(gulp.dest('./lib'));
 });
 

@@ -9,14 +9,16 @@ app.set('view engine', 'pug')
 app.set('views', './app/views')
 app.use('/static', express.static('public'))
 
-var SERVER_HOST = "localhost";
-var SERVER_PORT = 12345;
+var PORT = process.env.FRONTEND_SERVER_PORT;
+var SERVER_HOST = process.env.SERVER_HOST;
+var SERVER_TCP_PORT = process.env.SERVER_TCP_PORT;
+var SERVER_WS_PORT = process.env.SERVER_WS_PORT;
 
 
 app.get('/', function(req, res, next) {
   console.log('Request: [GET]', req.originalUrl);
 
-  var connection = net.connect(SERVER_PORT, SERVER_HOST, function() {
+  var connection = net.connect(SERVER_TCP_PORT, SERVER_HOST, function() {
     console.log("Successfully connected to backend server!");
     connection.write("0\r\n");
   });
@@ -26,14 +28,13 @@ app.get('/', function(req, res, next) {
     console.log('Received docId = ' + data);
     res.redirect('editor/' + data);
   });
-}
+});
 
 app.get('/editor/:docId', function(req, res, next) {
   console.log('Request: [GET]', req.originalUrl);
-  res.render('editor', {docId: req.params.docId})
+  res.render('editor', {docId: req.params.docId, serverHost: SERVER_HOST, serverPort: SERVER_WS_PORT});
 });
 
 
-const port = 8080;
-app.listen(port);
-console.log("Listening on port " + port);
+app.listen(PORT);
+console.log("Listening on port " + PORT);

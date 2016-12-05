@@ -66,8 +66,10 @@ var Editor = require('./editor.js').default;
     console.log("Attempting to set up connection");
 
     // TODO: Add meta tag with conn info
-    var docId = $("meta[name=docId]")[0].content;
-    var connection = new WebSocket("ws://128.208.7.75:" + SERVER_PORT + "/" + docId);
+    var docId = getMeta("docId");
+    var serverHost = getMeta("serverHost");
+    var serverPort = getMeta("serverPort");
+    var connection = new WebSocket("ws://" + serverHost + ":" + serverPort + "/" + docId);
 
     connection.onopen = function(event) {
       console.log("Connection success!");
@@ -96,6 +98,15 @@ var Editor = require('./editor.js').default;
       }
     };
     return connection;
+  }
+
+  function getMeta(tagName) {
+    var tags = $("meta[name=" + tagName + "]");
+    if (tags) {
+      return tags[0].content;
+    } else {
+      return null;
+    }
   }
 
   function sendChange() {
