@@ -14,7 +14,7 @@ gulp.task('build:server', function(done) {
 });
 
 gulp.task('build:app', function(done) {
-  return browserify({entries: './app/js/editor.js', debug: true})
+  return browserify({entries: './app/js/main.js', debug: true})
     .transform(babelify, {presets: ['es2015']})
     .bundle()
     .pipe(source('editor.js'))
