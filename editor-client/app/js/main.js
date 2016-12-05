@@ -23,18 +23,29 @@ var Editor = require('./editor.js').default;
   function setupInputListeners() {
     var textbox = $("#textbox");
     textbox.keypress(function(e) {
-      var key = e.key;
-      if (key === "Enter") {
-        key = "\n";
+      if (e.key === "Backspace" || e.key === "Delete") {
+        handleDelete(e);
+      } else if (!e.key.startsWith("Arrow")) {
+        handleInsert(e);
       }
-      var position = e.target.selectionStart;
-      var change = new Insert(position, key, (new Date()).getTime(), -1);
-      EDITOR.addPendingChange(change);
-      console.log(change.toString(), e);
-      sendChange();
     });
 
-    textbox.keydown(function(e) {
+    textbox.keydown(handleDelete);
+  }
+  
+  function handleInsert(e) {
+    var key = e.key;
+    if (key === "Enter") {
+      key = "\n";
+    }
+    var position = e.target.selectionStart;
+    var change = new Insert(position, key, (new Date()).getTime(), -1);
+    EDITOR.addPendingChange(change);
+    console.log(change.toString(), e);
+    sendChange();
+  }
+
+  function handleDelete(e) {
       // TODO: Handle copy and paste?
       var index = -1;
       var length = 1;
@@ -59,7 +70,6 @@ var Editor = require('./editor.js').default;
         EDITOR.addPendingChange(change);
         sendChange();
       }
-    });
   }
 
   function setupConnection() {
