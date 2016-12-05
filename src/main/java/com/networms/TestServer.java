@@ -23,6 +23,9 @@ import java.util.concurrent.PriorityBlockingQueue;
  * Created by Hunter on 12/3/16.
  */
 public class TestServer extends WebSocketServer {
+    private static final int TCP_PORT = 12345;
+    private static final int WEBSOCKET_PORT = 8081;
+
     private Map<WebSocket, ClientManager> currentConnections;
     private static Map<Long, DocumentManager> idToDM = new ConcurrentHashMap<>();
     private static Map<Long, ClientManager> idToCM = new ConcurrentHashMap<>();
@@ -77,22 +80,16 @@ public class TestServer extends WebSocketServer {
 
     public static void main(String[] args) throws IOException {
         System.out.println("Starting Server");
-        ServerSocket acceptor = new ServerSocket(12345);
-        // right now node server calls connect twice which is being fixed
-        // first socket will be node server & this blocks
-        Socket frontServer = acceptor.accept();
-        System.out.println("Accepted FE connection");
-        // set timeout for when we r listening for clientJS connections
-        acceptor.setSoTimeout(1000);
-        BufferedReader frontServerInput = new BufferedReader(new InputStreamReader(frontServer.getInputStream()));
-        OutputStreamWriter frontServerOutput = new OutputStreamWriter(frontServer.getOutputStream());
+        ServerSocket acceptor = new ServerSocket(TCP_PORT);
 
-        int port = 8081;
-        TestServer server = new TestServer(port);
+        TestServer server = new TestServer(WEBSOCKET_PORT);
         server.start();
 
         System.out.println("Ready to run!");
         while (true) {
+            Socket frontServer = acceptor.accept();
+            BufferedReader frontServerInput = new BufferedReader(new InputStreamReader(frontServer.getInputStream()));
+            OutputStreamWriter frontServerOutput = new OutputStreamWriter(frontServer.getOutputStream());
             if (frontServerInput.ready()) {
                 // new client tryna get a new ID
                 // following line DEPENDS ON NODE SERVER SENDING LITERALLY JUST THE REQUESTED DOC ID
