@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.PriorityBlockingQueue;
 
 /**
@@ -23,8 +24,8 @@ import java.util.concurrent.PriorityBlockingQueue;
  */
 public class TestServer extends WebSocketServer {
     private Map<WebSocket, ClientManager> currentConnections;
-    private static Map<Long, DocumentManager> idToDM;
-    private static Map<Long, ClientManager> idToCM = new HashMap<>();
+    private static Map<Long, DocumentManager> idToDM = new ConcurrentHashMap<>();
+    private static Map<Long, ClientManager> idToCM = new ConcurrentHashMap<>();
     private static Map<Long, DocHelpers> idToDocHelp;
 
     public TestServer(int port) throws UnknownHostException {
@@ -34,7 +35,6 @@ public class TestServer extends WebSocketServer {
     public TestServer(InetSocketAddress addr) {
         super(addr);
         this.currentConnections = new HashMap<>();
-        this.idToDM = new HashMap<>();
     }
 
     @Override
@@ -43,14 +43,16 @@ public class TestServer extends WebSocketServer {
 
         String id = clientHandshake.getResourceDescriptor().substring(1);
         long docID = Long.parseLong(id);
-        if (!idToCM.containsKey(docID)) {
-            createDocument(docID);
+        synchronized (TestServer.class) {
+            if (!idToCM.containsKey(docID)) {
+                createDocument(docID);
+            }
+            ClientManager clientManager = idToCM.get(docID);
+            clientManager.addClient(webSocket);
+            currentConnections.put(webSocket, clientManager);
+            webSocket.send(idToDM.get(docID).getContentsAndVersion());
         }
 
-        ClientManager clientManager = idToCM.get(docID);
-        clientManager.addClient(webSocket);
-        currentConnections.put(webSocket, clientManager);
-        webSocket.send(idToDM.get(docID).getContentsAndVersion());
     }
 
     @Override
@@ -96,15 +98,18 @@ public class TestServer extends WebSocketServer {
                 // following line DEPENDS ON NODE SERVER SENDING LITERALLY JUST THE REQUESTED DOC ID
                 long requestedID = Long.parseLong(frontServerInput.readLine().trim());
                 System.out.println(requestedID);
-                if (requestedID == 0L) {
-                    // if it is 0, generate rando id not 0 not in set
-                    requestedID = generateRandomID(idToCM.keySet());
-                }
+                synchronized (TestServer.class) {
 
-                if (!idToCM.containsKey(requestedID)) {
-                    // either client passed in specific new id or we have generated one
-                    // new doc with new queues
-                    createDocument(requestedID);
+                    if (requestedID == 0L) {
+                        // if it is 0, generate rando id not 0 not in set
+                        requestedID = generateRandomID(idToCM.keySet());
+                    }
+
+                    if (!idToCM.containsKey(requestedID)) {
+                        // either client passed in specific new id or we have generated one
+                        // new doc with new queues
+                        createDocument(requestedID);
+                    }
                 }
                 // ack the creation or verification of docID
                 System.out.println("Sending back to FE server: " + requestedID);
