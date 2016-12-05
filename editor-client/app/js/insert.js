@@ -37,7 +37,13 @@ export default class Insert extends Change {
         }
     }
 
-    apply(docText) {
+    apply(docText, selection) {
+        if (this.index < selection.start) {
+          selection.start += this.text.length;
+          selection.end += this.text.length;
+        } else if (this.index >= selection.start && this.index < selection.end) {
+          selection.end += this.text.length;
+        }
         return docText.substring(0, this.index) + this.text + docText.substring(this.index);
     }
 }

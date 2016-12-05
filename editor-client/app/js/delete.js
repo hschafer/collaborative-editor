@@ -82,8 +82,25 @@ export default class Delete extends Change {
         }
     }
 
-    apply(docText) {
+    apply(docText, selection) {
         // TODO: We need to deal with second delete here
+        if (this.index < selection.start && this.index + this.length < selection.start) {
+          // Delete is entirely before selection
+          selection.start -= this.length;
+          selection.end -= this.length;
+        } else if (this.index <= selection.start && this.index + this.length >= selection.end) {
+          // Delete entirely encapsulates selection, so remove selection
+          selection.start = this.index;
+          selection.end = this.index;
+        } else if (this.index < selection.start) {
+          // Delete starts before selection and overlaps partially
+          selection.start = this.index;
+          selection.end = selection.end - this.length;
+        } else if (this.index >= selection.start && this.index + this.length < selection.end) {
+          selection.end -= this.length;
+        } else if (this.index >= selection.start && this.index < selection.end) {
+          selection.end = this.index;
+        }
         return docText.substring(0, this.index) + docText.substring(this.index + this.length);
     }
 }

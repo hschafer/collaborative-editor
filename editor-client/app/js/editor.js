@@ -93,7 +93,7 @@ var Delete = require('./delete.js').default;
         console.log("Attempting to set up connection");
 
         var docId = $("meta[name=docId]")[0].content;
-        var connection = new WebSocket("ws://localhost" + SERVER_PORT + "/" + docId);
+        var connection = new WebSocket("ws://localhost:" + SERVER_PORT + "/" + docId);
 
         connection.onopen = function(event) {
           console.log("Connection success!");
@@ -156,13 +156,18 @@ var Delete = require('./delete.js').default;
           console.log("After applying OT to pending change", change);
         });
 
-        var textbox = $("#textbox");
-        console.log("Text before")
-        console.log(textbox[0].value)
-        var resultText = change.apply(textbox[0].value);
-        textbox[0].value = resultText;
-        console.log("Text after")
-        console.log(textbox[0].value)
+        var textbox = $("#textbox")[0];
+        var selection = {start: textbox.selectionStart, end: textbox.selectionEnd};
+        console.log("Text before (Selection: " + selection.start + " -> " + selection.end + ")")
+        console.log(textbox.value);
+
+        var resultText = change.apply(textbox.value, selection);
+
+        textbox.value = resultText;
+        textbox.selectionStart = selection.start;
+        textbox.selectionEnd = selection.end;
+        console.log("Text after (Selection: " + selection.start + " -> " + selection.end + ")")
+        console.log(textbox.value)
     }
 
     function parseChange(changeData) {
