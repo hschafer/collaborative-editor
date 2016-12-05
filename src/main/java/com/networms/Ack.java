@@ -33,5 +33,9 @@ public class Ack {
         return this.ackedChange;
     }
 
+    public int getNumContributers() {
+        return this.numContributers;
+    }
+
     public void setContributers(int contributers) {this.numContributers = contributers;}
 }

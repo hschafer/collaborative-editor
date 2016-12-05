@@ -18,30 +18,11 @@ var Delete = require('./delete.js').default;
 
     var FIRST_MESSAGE_RECEIVED = false;
 
+    var NUM_EDITORS = 1;
+
     window.onload = function() {
         setupInputListeners();
         CONNECTION = setupConnection();
-        var button = $("#test");
-        button.click(function(e) {
-            var testInsert = new Insert("Hunter", 3);
-            applyChange(testInsert);
-        });
-
-        button = $("#dTest");
-        button.click(function(e) {
-            var firstInsert = new Insert("Hunter", 10, 3, 5);
-	        var secondInsert = new Insert("Andrew", 20, 4, 6);
-            var secondChange = new Change(4, 5, 6);
-            console.log("first insert index:", firstInsert.index);
-            console.log("second change index:",  secondChange);
-            console.log(firstInsert.toString());
-            console.log(secondInsert.toString());
-            console.log(secondInsert.index);
-            firstInsert.transform(secondInsert);
-            console.log(firstInsert.toString());
-            console.log(secondInsert.toString());
-        });
-
     };
 
     function setupInputListeners() {
@@ -93,7 +74,7 @@ var Delete = require('./delete.js').default;
         console.log("Attempting to set up connection");
 
         var docId = $("meta[name=docId]")[0].content;
-        var connection = new WebSocket("ws://localhost:" + SERVER_PORT + "/" + docId);
+        var connection = new WebSocket("ws://128.208.7.75:" + SERVER_PORT + "/" + docId);
 
         connection.onopen = function(event) {
           console.log("Connection success!");
@@ -115,6 +96,8 @@ var Delete = require('./delete.js').default;
               SENT_ITEM = null;
             }
             VERSION = changeData["version"];
+            NUM_EDITORS = changeData["numContributers"];
+            updateEditors();
             sendChange();
           } else {
             var splitIndex = event.data.indexOf(",");
@@ -179,6 +162,34 @@ var Delete = require('./delete.js').default;
         return new Delete(changeData["index"], changeData["length"], changeData["time"],
             changeData["version"]);
       }
+    }
+
+    function updateEditors() {
+      var displayText = " editing this document right now";
+      if (NUM_EDITORS == 1) {
+        displayText = "There is 1 person" + displayText;
+      } else {
+        displayText = "There are " + NUM_EDITORS + " people" + displayText;
+      }
+
+      var editorButton = $("#editor-list-button")[0];
+      editorButton.innerHTML = displayText;
+      
+      var editorList = $("#editor-list");
+      editorList.empty();
+      var you = createListItem("You");
+      editorList.append(you);
+
+      var anon = createListItem("Anonymous");
+      for (var i = 1; i < NUM_EDITORS; i++) {
+        editorList.append(anon);
+      }
+    }
+
+    function createListItem(text) {
+      var li = document.createElement("li");
+      li.innerHTML = "<span>" + text + "</span>";
+      return li;
     }
 
     function sendChange() {

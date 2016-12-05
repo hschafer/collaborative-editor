@@ -21,11 +21,10 @@ html(lang="en")
     
     div.container
       div.section
-        a.dropdown-button.btn-flat.waves-effect.waves-teal.right.right-align(href='#', data-activates='editors-list') There are 2 people editing this document right now
+        a#editor-list-button.dropdown-button.btn-flat.waves-effect.waves-teal.right.right-align(href='#', data-activates='editor-list') There is 1 person editing this document right now
 
-        ul#editors-list.dropdown-content.right
-          li: span Hunter
-          li: span Anonymous
+        ul#editor-list.dropdown-content.right
+          li: span You
 
       div.section
         textarea#textbox.z-depth-2
