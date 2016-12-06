@@ -23,6 +23,11 @@ app.get('/', function(req, res, next) {
     connection.write("0\r\n");
   });
 
+  connection.setTimeout(2000, function() {
+    connection.end();
+    res.status(500).send({ error: "Something went wrong on our end and we weren't able to make" + 
+      " a new document for you. Please try again later!" });
+  });
 
   connection.on('data', function(data) {
     console.log('Received docId = ' + data);
