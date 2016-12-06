@@ -39,7 +39,7 @@ export default class Editor {
   applyChange(received) {
     var change = this.createChange(received);
     console.log("Received change", change);
-    this.applyOT(received);
+    this.applyOT(change);
 
     var selection = {start: this.textbox.selectionStart, end: this.textbox.selectionEnd};
     console.log("Text before (Selection: " + selection.start + " -> " + selection.end + ")");
