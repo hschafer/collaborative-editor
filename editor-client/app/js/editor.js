@@ -27,10 +27,10 @@ export default class Editor {
 
   acceptMessage(messageJSON) {
     if (messageJSON["change"]) {
-      console.log("Someone else's change, I'm going to apply it now!");
+//       console.log("Someone else's change, I'm going to apply it now!");
       this.applyChange(messageJSON);
     } else {
-      console.log("Got acknowledgement for my own change!");
+//       console.log("Got acknowledgement for my own change!");
       this.sentChange = null;
     }
     this.serverVersion = messageJSON["version"];
@@ -38,11 +38,11 @@ export default class Editor {
 
   applyChange(received) {
     var change = this.createChange(received);
-    console.log("Received change", change);
+//     console.log("Received change", change);
     this.applyOT(change);
 
     var selection = {start: this.textbox.selectionStart, end: this.textbox.selectionEnd};
-    console.log("Text before (Selection: " + selection.start + " -> " + selection.end + ")");
+//     console.log("Text before (Selection: " + selection.start + " -> " + selection.end + ")");
     console.log(this.textbox.value);
 
     var resultText = change.apply(this.textbox.value, selection);
@@ -50,8 +50,8 @@ export default class Editor {
     this.textbox.selectionStart = selection.start;
     this.textbox.selectionEnd = selection.end;
 
-    console.log("Text after (Selection: " + selection.start + " -> " + selection.end + ")");
-    console.log(this.textbox.value);
+    console.log("Text after (S// election: " + selection.start + " -> " + selection.end + ")");
+//     console.log(this.textbox.value);
   }
 
   createChange(received) {
@@ -69,12 +69,12 @@ export default class Editor {
   applyOT(receivedChange) {
     if (this.sentChange) {
       receivedChange.applyOT(this.sentChange);
-      console.log("Change after OT to sent", receivedChange);
+//       console.log("Change after OT to sent", receivedChange);
     }
 
     this.pendingList.forEach(function (pendingChange) {
       receivedChange.applyOT(pendingChange);
-      console.log("After applying OT to pending change", receivedChange);
+//       console.log("After applying OT to pending change", receivedChange);
     });
   }
 }

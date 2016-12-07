@@ -31,7 +31,6 @@ export default class Insert extends Change {
             } else {
                 // if inserting in the middle of stuff about to be deleted
                 // just make the insert to the beginning of deletion
-                console.log("got here parent");
                 change.applyOT(this);
             }
         }
