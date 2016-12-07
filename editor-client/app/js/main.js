@@ -91,7 +91,7 @@ var Editor = require('./editor.js').default;
 
     connection.onmessage = function(event) {
       if (EDITOR) {
-        console.log("Received data", event.data);
+//         console.log("Received data", event.data);
         var messageJSON = JSON.parse(event.data);
         EDITOR.acceptMessage(messageJSON);
         updateEditors(messageJSON["numContributers"]);
@@ -124,6 +124,7 @@ var Editor = require('./editor.js').default;
     if (change) {
       console.log("Sending to Server", change);
       CONNECTION.send(JSON.stringify(change));
+      console.log("sent change: " + change);
     }
   }
 
