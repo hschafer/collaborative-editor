@@ -7,17 +7,14 @@ var source = require('vinyl-source-stream');
 gulp.task('build:server', function(done) {
   return gulp.src('./server.js')
     .pipe(babel())
-    .on('error', function handleError() {
-      this.emit('end');
-    })
     .pipe(gulp.dest('./lib'));
 });
 
 gulp.task('build:app', function(done) {
-  return browserify({entries: './app/js/editor.js', debug: true})
+  return browserify({entries: './app/js/main.js', debug: true})
     .transform(babelify, {presets: ['es2015']})
     .bundle()
-    .pipe(source('editor.js'))
+    .pipe(source('bundle.js'))
     .pipe(gulp.dest('./public/js'));
 });
 

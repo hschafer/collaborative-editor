@@ -32,7 +32,6 @@ public class OTTest {
 
     @Test
     public void testInsertSamePlaceInsert() {
-        // TODO: not currently REFLEXIVE
         Insert incoming = new Insert(0, "hell");
         Insert pending = new Insert(0, "lleh");
         incoming.applyOT(pending);
@@ -74,7 +73,6 @@ public class OTTest {
 
     @Test
     public void testDeleteBeforeInsertWithOverlap() {
-        // TODO: not currently REFLEXIVE
         Delete incoming = new Delete(1, 3);
         Insert pending = new Insert(3, "hello");
         incoming.applyOT(pending);

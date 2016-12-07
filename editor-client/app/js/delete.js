@@ -4,13 +4,13 @@ import Insert from './insert';
 
 export default class Delete extends Change {
     constructor(index, length, time, version) {
-        super(time, index, version);
+        super(time, index, version, "delete");
         this.length = length;
         this.second = null;
     }
 
     toString() { 
-        return "Delete(" + this.length + ", @" + this.index + ")";
+        return "Delete(" + this.length + ", @" + this.index + ", v: " + this.version + ")";
     }
 
     hasSecond() {
@@ -22,14 +22,14 @@ export default class Delete extends Change {
     }
 
     decrementLength(amount) {
-        this.length =  Math.max(0, this.length - amount)
+        this.length = Math.max(0, this.length - amount)
     }
 
     getEndIndex() {
         return this.length + this.index;
     }
 
-    equals(object) {
+    sameDelete(object) {
         return object.index == this.index && object.length == this.length;
     } 
 
@@ -58,14 +58,13 @@ export default class Delete extends Change {
                 this.decrementIndex(change.length);
             } else {
                 // overlap
-                if (this.equals(change)) {
+                if (this.sameDelete(change)) {
                     // exact same deletion
                     makeEmptyDelete(this);
                     makeEmptyDelete(change);
                 } else if (change.index == this.index) {
                     if (change.length < this.length) {
                         // curr ends first
-                        console.log("right here");
                         this.index = change.index;
                         this.decrementLength(change.length);
                         makeEmptyDelete(change);
@@ -83,7 +82,25 @@ export default class Delete extends Change {
         }
     }
 
-    apply(docText) {
+    apply(docText, selection) {
+        // TODO: We need to deal with second delete here
+        if (this.index < selection.start && this.index + this.length < selection.start) {
+          // Delete is entirely before selection
+          selection.start -= this.length;
+          selection.end -= this.length;
+        } else if (this.index <= selection.start && this.index + this.length >= selection.end) {
+          // Delete entirely encapsulates selection, so remove selection
+          selection.start = this.index;
+          selection.end = this.index;
+        } else if (this.index < selection.start) {
+          // Delete starts before selection and overlaps partially
+          selection.start = this.index;
+          selection.end = selection.end - this.length;
+        } else if (this.index >= selection.start && this.index + this.length < selection.end) {
+          selection.end -= this.length;
+        } else if (this.index >= selection.start && this.index < selection.end) {
+          selection.end = this.index;
+        }
         return docText.substring(0, this.index) + docText.substring(this.index + this.length);
     }
 }

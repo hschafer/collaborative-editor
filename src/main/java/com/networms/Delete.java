@@ -1,11 +1,14 @@
 package com.networms;
 
-import java.net.Socket;
+import org.java_websocket.WebSocket;
 import java.util.Optional;
 
 public class Delete extends Change {
     private int length;
     private Optional<Delete> second;
+
+    public Delete() {
+    }
 
     // should be used for testing purposes only ?
     public Delete(int index, int length) {
@@ -16,7 +19,7 @@ public class Delete extends Change {
         this(other.index, other.length, 0, other.version, other.sender);
     }
 
-    public Delete(int index, int length, long currTime, int version, Socket sender) {
+    public Delete(int index, int length, long currTime, int version, WebSocket sender) {
         this.index = index;
         this.length = length;
         this.time = currTime;
@@ -53,7 +56,7 @@ public class Delete extends Change {
     }
 
     public String toString() {
-        return "delete " + this.length + " @" + this.index;
+        return "delete " + this.length + " @" + this.index + " version: " + this.version;
     }
 
     public int getEndIndex() {
@@ -125,7 +128,6 @@ public class Delete extends Change {
     private static void deleteDelete(Delete c1, Delete c2) {
         if (c1.getEndIndex() <= c2.getEndIndex()) {
             // cur starts before iC starts & ends at or before iC end
-
             int oldC2Index = c2.index;
             int oldC2Endex = c2.getEndIndex();
             int oldC1Index = c1.index;
