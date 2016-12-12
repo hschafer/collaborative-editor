@@ -8,21 +8,18 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Created by Hunter on 12/3/16.
  */
-public class TestServer extends WebSocketServer {
+public class ServerMain extends WebSocketServer {
     private static final int TCP_PORT = 12345;
     private static final int WEBSOCKET_PORT = 8081;
 
@@ -31,11 +28,11 @@ public class TestServer extends WebSocketServer {
     private static Map<Long, ClientManager> idToCM = new ConcurrentHashMap<>();
     private static Map<Long, DocHelpers> idToDocHelp;
 
-    public TestServer(int port) throws UnknownHostException {
+    public ServerMain(int port) throws UnknownHostException {
         this(new InetSocketAddress(port));
     }
 
-    public TestServer(InetSocketAddress addr) {
+    public ServerMain(InetSocketAddress addr) {
         super(addr);
         this.currentConnections = new HashMap<>();
     }
@@ -46,7 +43,7 @@ public class TestServer extends WebSocketServer {
 
         String id = clientHandshake.getResourceDescriptor().substring(1);
         long docID = Long.parseLong(id);
-        synchronized (TestServer.class) {
+        synchronized (ServerMain.class) {
             if (!idToCM.containsKey(docID)) {
                 createDocument(docID);
             }
@@ -81,37 +78,42 @@ public class TestServer extends WebSocketServer {
     public static void main(String[] args) throws IOException {
         System.out.println("Starting Server");
         ServerSocket acceptor = new ServerSocket(TCP_PORT);
+        acceptor.setSoTimeout(3000);
 
-        TestServer server = new TestServer(WEBSOCKET_PORT);
+        ServerMain server = new ServerMain(WEBSOCKET_PORT);
         server.start();
 
         System.out.println("Ready to run!");
         while (true) {
-            Socket frontServer = acceptor.accept();
-            BufferedReader frontServerInput = new BufferedReader(new InputStreamReader(frontServer.getInputStream()));
-            OutputStreamWriter frontServerOutput = new OutputStreamWriter(frontServer.getOutputStream());
-            if (frontServerInput.ready()) {
-                // new client tryna get a new ID
-                // following line DEPENDS ON NODE SERVER SENDING LITERALLY JUST THE REQUESTED DOC ID
-                long requestedID = Long.parseLong(frontServerInput.readLine().trim());
-                System.out.println(requestedID);
-                synchronized (TestServer.class) {
+            try {
+                Socket frontServer = acceptor.accept();
+                BufferedReader frontServerInput = new BufferedReader(new InputStreamReader(frontServer.getInputStream()));
+                OutputStreamWriter frontServerOutput = new OutputStreamWriter(frontServer.getOutputStream());
+                if (frontServerInput.ready()) {
+                    // new client tryna get a new ID
+                    // following line DEPENDS ON NODE SERVER SENDING LITERALLY JUST THE REQUESTED DOC ID
+                    long requestedID = Long.parseLong(frontServerInput.readLine().trim());
+                    System.out.println(requestedID);
+                    synchronized (ServerMain.class) {
+                        if (requestedID == 0L) {
+                            // if it is 0, generate rando id not 0 not in set
+                            requestedID = generateRandomID(idToCM.keySet());
+                        }
 
-                    if (requestedID == 0L) {
-                        // if it is 0, generate rando id not 0 not in set
-                        requestedID = generateRandomID(idToCM.keySet());
+                        if (!idToCM.containsKey(requestedID)) {
+                            // either client passed in specific new id or we have generated one
+                            // new doc with new queues
+                            createDocument(requestedID);
+                        }
                     }
-
-                    if (!idToCM.containsKey(requestedID)) {
-                        // either client passed in specific new id or we have generated one
-                        // new doc with new queues
-                        createDocument(requestedID);
-                    }
+                    // ack the creation or verification of docID
+                    System.out.println("Sending back to FE server: " + requestedID);
+                    frontServerOutput.write("" + requestedID);
+                    frontServerOutput.flush();
                 }
-                // ack the creation or verification of docID
-                System.out.println("Sending back to FE server: " + requestedID);
-                frontServerOutput.write("" + requestedID);
-                frontServerOutput.flush();
+                frontServer.close();
+            } catch (SocketTimeoutException e) {
+
             }
         }
     }
@@ -119,14 +121,14 @@ public class TestServer extends WebSocketServer {
     private static long generateRandomID(Set<Long> usedIDs) {
         long id = 0L;
         while (id == 0L && !usedIDs.contains(id)) {
-            id = (long)(Long.MAX_VALUE * Math.random());
+            id = (long) (Long.MAX_VALUE * Math.random());
         }
         return id;
     }
 
     private static void createDocument(long docID) {
-        BlockingQueue<Change> worklist = new PriorityBlockingQueue<>();
-        BlockingQueue<Change> acklist = new PriorityBlockingQueue<>();
+        BlockingQueue<Change> worklist = new LinkedBlockingQueue<>();
+        BlockingQueue<Change> acklist = new LinkedBlockingQueue<>();
         DocumentManager docMgr = new DocumentManager(worklist, acklist);
         ClientManager clientMgr = new ClientManager(worklist, acklist);
         idToCM.put(docID, clientMgr);
