@@ -30,7 +30,7 @@ export default class Editor {
 //       console.log("Someone else's change, I'm going to apply it now!");
       this.applyChange(messageJSON);
     } else {
-//       console.log("Got acknowledgement for my own change!");
+      console.log("Received Ack: " + (new Date()).getTime());
       this.sentChange = null;
     }
     this.serverVersion = messageJSON["version"];
@@ -43,14 +43,14 @@ export default class Editor {
 
     var selection = {start: this.textbox.selectionStart, end: this.textbox.selectionEnd};
 //     console.log("Text before (Selection: " + selection.start + " -> " + selection.end + ")");
-    console.log(this.textbox.value);
+    //console.log(this.textbox.value);
 
     var resultText = change.apply(this.textbox.value, selection);
     this.textbox.value = resultText;
     this.textbox.selectionStart = selection.start;
     this.textbox.selectionEnd = selection.end;
 
-    console.log("Text after (S// election: " + selection.start + " -> " + selection.end + ")");
+    //console.log("Text after (S// election: " + selection.start + " -> " + selection.end + ")");
 //     console.log(this.textbox.value);
   }
 

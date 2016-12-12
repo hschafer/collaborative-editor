@@ -8,7 +8,8 @@ export default class Insert extends Change {
     }
 
     toString() {
-        return "Insert(\"" + this.text + "\", @" + this.index + ", " + this.getEndIndex() + ", v: " + this.version + ")";
+        return "Insert(\"" + this.text + "\", @" + this.index + ", " + this.getEndIndex() + ", v: " + this.version + ", " 
+            + this.time + ")";
     }
 
     getEndIndex() {

@@ -10,7 +10,7 @@ export default class Delete extends Change {
     }
 
     toString() { 
-        return "Delete(" + this.length + ", @" + this.index + ", v: " + this.version + ")";
+        return "Delete(" + this.length + ", @" + this.index + ", v: " + this.version + ", " + this.time + ")";
     }
 
     hasSecond() {
