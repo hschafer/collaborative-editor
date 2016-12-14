@@ -6,11 +6,7 @@ Authors: Andrew Dawson, Hunter Schafer, Natalie Andreeva
 
 #How to Run
 
-`./mvnw spring-boot:run`  
-`mkdir out`  
-`javac -d out src/main/java/com/networms/*.java`  
-`cd out`  
-`java ServerMain`  
+`java -jar ServerMain` 
 
 Open a new shell  
 `cd editor-client`  
