@@ -9,20 +9,15 @@ export default class Editor {
     this.sentChange = null;
     this.serverVersion = version;
     this.textbox = textbox;
-    this.n = 0;
   }
 
   getChangeToSend() {
     if (this.sentChange || this.pendingList.length === 0) {
       return null;
     } else {
-    this.n++;
-    console.log(this.n);
-    if (this.n % 3 == 0){
       this.sentChange = this.pendingList.shift();
       this.sentChange.version = this.serverVersion + 1;
       return this.sentChange;
-      }
     }
   }
 
