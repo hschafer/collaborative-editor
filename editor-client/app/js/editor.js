@@ -9,20 +9,49 @@ export default class Editor {
     this.sentChange = null;
     this.serverVersion = version;
     this.textbox = textbox;
+    this.n = 0;
   }
 
   getChangeToSend() {
     if (this.sentChange || this.pendingList.length === 0) {
       return null;
     } else {
+    this.n++;
+    console.log(this.n);
+    if (this.n % 3 == 0){
       this.sentChange = this.pendingList.shift();
       this.sentChange.version = this.serverVersion + 1;
       return this.sentChange;
+      }
     }
   }
 
   addPendingChange(change) {
+  	if (this.pendingList.length > 0) {
+  		var lastChange = this.pendingList[this.pendingList.length - 1];
+		this.pendingList.pop();
+  		if (lastChange instanceof Insert && change instanceof Insert) {
+  			if (change.index == lastChange.index) {
+  				change = new Insert(change.index, change.text.concat(lastChange.text), 
+  					(new Date()).getTime(), lastChange.version);
+  			} else if (change.index == lastChange.getEndIndex()) {
+  				  			console.log(lastChange.text.concat(change.text));
+
+  				change = new Insert(lastChange.index, lastChange.text.concat(change.text), 
+  					(new Date()).getTime(), lastChange.version);
+  					  					console.log(change.text);
+
+  			} else {
+  				this.pendingList.push(lastChange);
+  			}
+  		} else {
+  			this.pendingList.push(lastChange);
+  		}	
+    }
     this.pendingList.push(change);
+    console.log(change);
+    console.log(this.pendingList);
+    console.log();
   }
 
   acceptMessage(messageJSON) {
