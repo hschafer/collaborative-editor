@@ -83,7 +83,6 @@ export default class Delete extends Change {
     }
 
     apply(docText, selection) {
-        // TODO: We need to deal with second delete here
         if (this.index < selection.start && this.index + this.length < selection.start) {
           // Delete is entirely before selection
           selection.start -= this.length;

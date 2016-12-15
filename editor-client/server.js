@@ -23,6 +23,10 @@ app.get('/', function(req, res, next) {
     connection.write("0\r\n");
   });
 
+  connection.on('error', function(err) { 
+    console.error(err)
+  });
+
   connection.setTimeout(3000, function() {
     connection.destroy();
     res.status(500).send({ error: "Something went wrong on our end and we weren't able to make" + 

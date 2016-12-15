@@ -41,7 +41,6 @@ var Editor = require('./editor.js').default;
     var position = e.target.selectionStart;
     var change = new Insert(position, key, (new Date()).getTime(), -1);
     EDITOR.addPendingChange(change);
-    //console.log(change.toString(), e);
     sendChange();
   }
 
@@ -66,24 +65,16 @@ var Editor = require('./editor.js').default;
 
       if (index >= 0) {
         var change = new Delete(index, length, (new Date()).getTime(), -1);
-        //console.log(change.toString(), e);
         EDITOR.addPendingChange(change);
         sendChange();
       }
   }
 
   function setupConnection() {
-    //console.log("Attempting to set up connection");
-
-    // TODO: Add meta tag with conn info
     var docId = getMeta("docId");
     var serverHost = getMeta("serverHost");
     var serverPort = getMeta("serverPort");
     var connection = new WebSocket("ws://" + serverHost + ":" + serverPort + "/" + docId);
-
-    connection.onopen = function(event) {
-      //console.log("Connection success!");
-    }
 
     connection.onerror = function(error) {
       console.log("Error occurred", error);
@@ -91,7 +82,6 @@ var Editor = require('./editor.js').default;
 
     connection.onmessage = function(event) {
       if (EDITOR) {
-//         //console.log("Received data", event.data);
         var messageJSON = JSON.parse(event.data);
         // If the version is less than 0 it is a special message from the server
         if (messageJSON["version"] >= 0) {
@@ -100,7 +90,7 @@ var Editor = require('./editor.js').default;
         updateEditors(messageJSON["numContributers"]);
         sendChange();
       } else {
-        // TODO: Add ready state
+        $("#loading").hide();
         var splitIndex = event.data.indexOf(",");
         var version = parseInt(event.data.substring(0, splitIndex));
         var text = event.data.substring(splitIndex + 1);
@@ -125,7 +115,6 @@ var Editor = require('./editor.js').default;
   function sendChange() {
     var change = EDITOR.getChangeToSend();
     if (change) {
-      //console.log("Sending to Server", change);
       CONNECTION.send(JSON.stringify(change));
       console.log("sent change: " + (new Date()).getTime());
     }
