@@ -1,4 +1,8 @@
-package com.networms;
+package com.networms.document;
+
+import com.networms.operations.Change;
+import com.networms.operations.Delete;
+import com.networms.operations.Insert;
 
 import java.util.*;
 

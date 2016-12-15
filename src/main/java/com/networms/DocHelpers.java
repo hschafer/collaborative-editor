@@ -1,5 +1,8 @@
 package com.networms;
 
+import com.networms.client.ClientManager;
+import com.networms.document.DocumentManager;
+
 /**
  * Holds a reference to DocumentManager and ClientManager for a doc
  * Literally just to prevent us from having multiple maps in TestServer

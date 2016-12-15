@@ -1,6 +1,7 @@
-package com.networms;
+package com.networms.client;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.networms.operations.Change;
 import org.java_websocket.WebSocket;
 
 import java.io.*;

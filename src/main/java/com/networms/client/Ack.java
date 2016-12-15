@@ -1,5 +1,7 @@
-package com.networms;
+package com.networms.client;
 
+
+import com.networms.operations.Change;
 
 /**
  * Simple class to represent an ack sent from DocManager

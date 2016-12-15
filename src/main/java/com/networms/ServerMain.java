@@ -1,5 +1,8 @@
 package com.networms;
 
+import com.networms.client.ClientManager;
+import com.networms.document.DocumentManager;
+import com.networms.operations.Change;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;

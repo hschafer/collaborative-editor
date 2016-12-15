@@ -1,5 +1,8 @@
-package com.networms;
+package com.networms.document;
 
+
+import com.networms.document.Document;
+import com.networms.operations.Change;
 
 import java.util.List;
 import java.util.concurrent.BlockingQueue;

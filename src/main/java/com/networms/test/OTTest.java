@@ -1,6 +1,7 @@
 package com.networms.test;
 
-import com.networms.*;
+import com.networms.operations.Delete;
+import com.networms.operations.Insert;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

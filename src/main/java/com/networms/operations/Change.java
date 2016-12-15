@@ -1,4 +1,4 @@
-package com.networms;
+package com.networms.operations;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -19,10 +19,10 @@ import org.java_websocket.WebSocket;
 })
 @JsonIgnoreProperties({"sender"})
 public abstract class Change implements Comparable<Change> {
-    long time;
-    int index;
-    int version;
-    WebSocket sender;
+    public long time;
+    public int index;
+    public int version;
+    public WebSocket sender;
 
     public int getIndex() {
         return index;
