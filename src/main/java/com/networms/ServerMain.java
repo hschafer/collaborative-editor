@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.jar.Pack200;
 
 /**
  * Created by Hunter on 12/3/16.
@@ -36,7 +37,7 @@ public class ServerMain extends WebSocketServer {
 
     public ServerMain(InetSocketAddress addr) {
         super(addr);
-        this.currentConnections = new HashMap<>();
+        this.currentConnections = new ConcurrentHashMap<>();
     }
 
     @Override
@@ -45,16 +46,14 @@ public class ServerMain extends WebSocketServer {
 
         String id = clientHandshake.getResourceDescriptor().substring(1);
         long docID = Long.parseLong(id);
-        synchronized (ServerMain.class) {
-            if (!idToCM.containsKey(docID)) {
-                createDocument(docID);
-            }
-            ClientManager clientManager = idToCM.get(docID);
-            webSocket.send(idToDM.get(docID).getContentsAndVersion());
-            currentConnections.put(webSocket, clientManager);
-            clientManager.addClient(webSocket);
+        if (!idToCM.containsKey(docID)) {
+            webSocket.close();
+            throw new IllegalArgumentException();
         }
-
+        ClientManager clientManager = idToCM.get(docID);
+        webSocket.send(idToDM.get(docID).getContentsAndVersion());
+        currentConnections.put(webSocket, clientManager);
+        clientManager.addClient(webSocket);
     }
 
     @Override
@@ -89,6 +88,7 @@ public class ServerMain extends WebSocketServer {
         while (true) {
             try {
                 Socket frontServer = acceptor.accept();
+                System.out.println("Accepted Connection");
                 BufferedReader frontServerInput = new BufferedReader(new InputStreamReader(frontServer.getInputStream()));
                 OutputStreamWriter frontServerOutput = new OutputStreamWriter(frontServer.getOutputStream());
                 if (frontServerInput.ready()) {
@@ -115,7 +115,7 @@ public class ServerMain extends WebSocketServer {
                 }
                 frontServer.close();
             } catch (SocketTimeoutException e) {
-
+                System.out.println(e);
             }
         }
     }
