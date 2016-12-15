@@ -29,7 +29,6 @@ public class ServerMain extends WebSocketServer {
     private Map<WebSocket, ClientManager> currentConnections;
     private static Map<Long, DocumentManager> idToDM = new ConcurrentHashMap<>();
     private static Map<Long, ClientManager> idToCM = new ConcurrentHashMap<>();
-    private static Map<Long, DocHelpers> idToDocHelp;
 
     public ServerMain(int port) throws UnknownHostException {
         this(new InetSocketAddress(port));
