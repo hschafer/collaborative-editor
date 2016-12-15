@@ -50,7 +50,7 @@ public class ClientManager implements Runnable{
             for (WebSocket client : this.clients) {
                 client.send(toSend);
             }
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

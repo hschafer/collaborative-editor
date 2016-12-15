@@ -12,13 +12,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.jar.Pack200;
 
 /**
  * Created by Hunter on 12/3/16.
@@ -115,7 +113,7 @@ public class ServerMain extends WebSocketServer {
                 }
                 frontServer.close();
             } catch (SocketTimeoutException e) {
-                System.out.println(e);
+                continue;
             }
         }
     }
