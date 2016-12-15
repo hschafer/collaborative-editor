@@ -128,8 +128,8 @@ var Editor = require('./editor.js').default;
     var you = createListItem("You");
     editorList.append(you);
 
-    var anon = createListItem("Anonymous");
     for (var i = 1; i < numEditors; i++) {
+      var anon = createListItem("Anonymous");
       editorList.append(anon);
     }
   }
