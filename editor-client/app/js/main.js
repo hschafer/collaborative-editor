@@ -86,14 +86,17 @@ var Editor = require('./editor.js').default;
     }
 
     connection.onerror = function(error) {
-      //console.log("Error occurred", error);
+      console.log("Error occurred", error);
     }
 
     connection.onmessage = function(event) {
       if (EDITOR) {
 //         //console.log("Received data", event.data);
         var messageJSON = JSON.parse(event.data);
-        EDITOR.acceptMessage(messageJSON);
+        // If the version is less than 0 it is a special message from the server
+        if (messageJSON["version"] >= 0) {
+            EDITOR.acceptMessage(messageJSON);
+        }
         updateEditors(messageJSON["numContributers"]);
         sendChange();
       } else {

@@ -1,7 +1,9 @@
 package com.networms.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networms.operations.Change;
+import com.networms.operations.Insert;
 import org.java_websocket.WebSocket;
 
 import java.io.*;
@@ -26,12 +28,30 @@ public class ClientManager implements Runnable{
         // Since this is synchronized this should be safe :D
         synchronized (this.clients) {
             this.clients.add(client);
+            notifyNumClients();
         }
     }
 
     public void removeClient(WebSocket client) {
         synchronized (this.clients) {
             this.clients.remove(client);
+            notifyNumClients();
+        }
+    }
+
+    private void notifyNumClients() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enableDefaultTyping();
+        Insert empty = new Insert(0, "", 0, -1, null);
+        Ack message = new Ack(empty.version, empty);
+        message.setContributers(this.clients.size());
+        try {
+            String toSend = mapper.writeValueAsString(message);
+            for (WebSocket client : this.clients) {
+                client.send(toSend);
+            }
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
         }
     }
 

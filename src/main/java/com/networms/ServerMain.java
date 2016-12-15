@@ -50,9 +50,9 @@ public class ServerMain extends WebSocketServer {
                 createDocument(docID);
             }
             ClientManager clientManager = idToCM.get(docID);
-            clientManager.addClient(webSocket);
-            currentConnections.put(webSocket, clientManager);
             webSocket.send(idToDM.get(docID).getContentsAndVersion());
+            currentConnections.put(webSocket, clientManager);
+            clientManager.addClient(webSocket);
         }
 
     }
