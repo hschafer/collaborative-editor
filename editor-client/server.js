@@ -14,7 +14,6 @@ var SERVER_HOST = process.env.SERVER_HOST;
 var SERVER_TCP_PORT = process.env.SERVER_TCP_PORT;
 var SERVER_WS_PORT = process.env.SERVER_WS_PORT;
 
-
 app.get('/', function(req, res, next) {
   console.log('Request: [GET]', req.originalUrl);
 
@@ -35,12 +34,12 @@ app.get('/', function(req, res, next) {
 
   connection.on('data', function(data) {
     console.log('Received docId = ' + data);
-    res.redirect('editor/' + data);
+    res.redirect(data);
     connection.destroy();
   });
 });
 
-app.get('/editor/:docId', function(req, res, next) {
+app.get('/:docId', function(req, res, next) {
   console.log('Request: [GET]', req.originalUrl);
   res.render('editor', {docId: req.params.docId, serverHost: SERVER_HOST, serverPort: SERVER_WS_PORT});
 });
