@@ -6,8 +6,8 @@ import net from 'net';
 
 const app = express();
 app.set('view engine', 'pug')
-app.set('views', './app/views')
-app.use('/static', express.static('public'))
+app.set('views', path.join(__dirname, '..', 'app/views'))
+app.use('/static', express.static(path.join(__dirname, '..', 'public')))
 
 var PORT = process.env.FRONTEND_SERVER_PORT;
 var SERVER_HOST = process.env.SERVER_HOST;

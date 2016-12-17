@@ -23,7 +23,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class ServerMain extends WebSocketServer {
     private static final int TCP_PORT = 12345;
-    private static final int WEBSOCKET_PORT = 8081;
+    private static final int WEBSOCKET_PORT = 12346;
 
     private Map<WebSocket, ClientManager> currentConnections;
     private static Map<Long, DocumentManager> idToDM = new ConcurrentHashMap<>();
@@ -82,7 +82,8 @@ public class ServerMain extends WebSocketServer {
         ServerMain server = new ServerMain(WEBSOCKET_PORT);
         server.start();
 
-        System.out.println("Ready to run!");
+        System.out.println("Ready to run! Listening to TCP connections on " + TCP_PORT
+            + " and WebSocket connections on " + WEBSOCKET_PORT);
         while (true) {
             try {
                 Socket frontServer = acceptor.accept();
